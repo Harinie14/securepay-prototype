@@ -1,0 +1,1847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>SecurePay — Clickable Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0E1C36;
+  --navy-2:#16294B;
+  --navy-3:#22385F;
+  --navy-tint:#EDF1FA;
+  --ink:#101826;
+  --muted:#6B7590;
+  --muted-2:#98A0B8;
+  --line:#E4E8F2;
+  --bg:#EFF2F8;
+  --white:#FFFFFF;
+  --green:#1D9E6D;
+  --green-tint:#E4F7EF;
+  --green-line:#BEE9D5;
+  --orange:#DB8A2E;
+  --orange-tint:#FCF0DE;
+  --orange-line:#F3D9A8;
+  --red:#D6483F;
+  --red-tint:#FBEAEA;
+  --red-line:#F1C4C0;
+  --radius-lg:22px;
+  --radius-md:16px;
+  --radius-sm:11px;
+  --shadow-card:0 2px 10px rgba(14,28,54,.05), 0 1px 2px rgba(14,28,54,.04);
+  --shadow-pop:0 20px 50px -12px rgba(10,20,40,.35);
+  --font-display:'Space Grotesk', sans-serif;
+  --font-body:'Inter', sans-serif;
+  --font-mono:'IBM Plex Mono', monospace;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:var(--font-body);
+  background:var(--bg);
+  color:var(--ink);
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow-x:hidden;
+}
+
+/* ---------- Stage (desktop presentation backdrop) ---------- */
+.stage{
+  width:100%;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:26px;
+  padding:48px 20px 64px;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(14,28,54,.05), transparent 42%),
+    radial-gradient(circle at 88% 92%, rgba(29,158,109,.06), transparent 40%),
+    var(--bg);
+  position:relative;
+}
+.stage-label{ text-align:center; max-width:420px; }
+.stage-eyebrow{
+  font-family:var(--font-mono);
+  font-size:11px;
+  letter-spacing:.14em;
+  color:var(--muted);
+  font-weight:600;
+}
+.stage-label h1{
+  font-family:var(--font-display);
+  font-size:30px;
+  font-weight:700;
+  color:var(--navy);
+  margin:6px 0 4px;
+  letter-spacing:-.01em;
+}
+.stage-label p{
+  font-size:14px;
+  color:var(--muted);
+  margin:0;
+}
+
+.app-wrap{
+  width:390px;
+  height:844px;
+  position:relative;
+}
+.phone{
+  width:100%;
+  height:100%;
+  background:var(--white);
+  border-radius:44px;
+  box-shadow:var(--shadow-pop), 0 0 0 10px var(--navy), 0 0 0 12px rgba(14,28,54,.15);
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  position:relative;
+}
+.notch{
+  position:absolute;
+  top:0; left:50%; transform:translateX(-50%);
+  width:120px; height:26px;
+  background:var(--navy);
+  border-radius:0 0 16px 16px;
+  z-index:50;
+}
+
+.statusbar{
+  height:46px;
+  min-height:46px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 26px;
+  font-family:var(--font-mono);
+  font-size:13px;
+  font-weight:600;
+  color:var(--ink);
+  background:var(--white);
+  position:relative;
+  z-index:10;
+}
+.statusbar .icons{display:flex; align-items:center; gap:5px;}
+.statusbar svg{display:block;}
+
+/* ---------- App header (per-screen) ---------- */
+.appheader{
+  min-height:52px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:2px 18px 14px;
+  background:var(--white);
+  border-bottom:1px solid transparent;
+}
+.appheader.bordered{border-bottom:1px solid var(--line);}
+.back-btn{
+  width:34px; height:34px;
+  border-radius:50%;
+  border:1px solid var(--line);
+  background:var(--white);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer;
+  flex:none;
+  color:var(--navy);
+}
+.back-btn:active{background:var(--navy-tint);}
+.appheader h2{
+  font-family:var(--font-display);
+  font-size:17px;
+  font-weight:600;
+  margin:0;
+  color:var(--navy);
+  letter-spacing:-.01em;
+}
+
+/* ---------- Scroll content ---------- */
+.appcontent{
+  flex:1;
+  overflow-y:auto;
+  background:var(--bg);
+  -ms-overflow-style:none;
+  scrollbar-width:none;
+}
+.appcontent::-webkit-scrollbar{display:none;}
+.screen-pad{ padding:18px 18px 34px; }
+.screen-flush{ padding:0 0 34px; }
+
+/* ---------- Typography helpers ---------- */
+h1.disp,h2.disp,h3.disp{ font-family:var(--font-display); color:var(--navy); letter-spacing:-.01em; margin:0; }
+.eyebrow{
+  font-family:var(--font-mono);
+  font-size:10.5px;
+  font-weight:600;
+  letter-spacing:.1em;
+  color:var(--muted);
+  text-transform:uppercase;
+}
+.muted{ color:var(--muted); }
+.small{ font-size:12.5px; }
+.mono{ font-family:var(--font-mono); }
+p{ line-height:1.5; }
+
+/* ---------- Buttons ---------- */
+.btn{
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  width:100%;
+  padding:14px 18px;
+  border-radius:14px;
+  font-family:var(--font-body);
+  font-weight:600;
+  font-size:14.5px;
+  border:none;
+  cursor:pointer;
+  transition:transform .06s ease, opacity .15s ease;
+  text-align:center;
+}
+.btn:active{ transform:scale(.98); }
+.btn-primary{ background:linear-gradient(155deg, var(--navy-2), var(--navy)); color:var(--white); box-shadow:0 6px 16px -6px rgba(14,28,54,.45); }
+.btn-primary:hover{ background:linear-gradient(155deg, var(--navy-3), var(--navy-2)); }
+.btn-secondary{ background:var(--white); color:var(--navy); border:1.5px solid var(--navy); }
+.btn-ghost{ background:transparent; color:var(--navy); font-weight:600; padding:12px; }
+.btn-danger-line{ background:var(--white); color:var(--red); border:1.5px solid var(--red-line); }
+.btn-sm{ padding:9px 14px; font-size:13px; border-radius:11px; width:auto; }
+.btn-block-row{ display:flex; gap:10px; }
+.btn-block-row .btn{ flex:1; }
+
+/* ---------- Cards ---------- */
+.card{
+  background:var(--white);
+  border:1px solid var(--line);
+  border-radius:var(--radius-md);
+  padding:16px;
+  box-shadow:var(--shadow-card);
+}
+.card + .card{ margin-top:12px; }
+.stack > * + *{ margin-top:12px; }
+.card-accent{ border-left:4px solid var(--navy); }
+.card-accent.risk-low{ border-left-color:var(--green); }
+.card-accent.risk-moderate{ border-left-color:var(--orange); }
+.card-accent.risk-high{ border-left-color:var(--red); }
+
+/* ---------- Rows / fields ---------- */
+.field{ margin-bottom:14px; }
+.field label{
+  display:block;
+  font-size:12px;
+  font-weight:600;
+  color:var(--muted);
+  margin-bottom:6px;
+}
+.input{
+  width:100%;
+  padding:13px 14px;
+  border-radius:12px;
+  border:1.5px solid var(--line);
+  font-family:var(--font-body);
+  font-size:14.5px;
+  color:var(--ink);
+  background:var(--white);
+}
+.input:focus{ outline:none; border-color:var(--navy-3); }
+select.input{ appearance:none; -webkit-appearance:none; background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='9'><path d='M1 1l6 6 6-6' stroke='%236B7590' stroke-width='1.6' fill='none'/></svg>"); background-repeat:no-repeat; background-position:right 14px center; }
+
+.kv-row{
+  display:flex; justify-content:space-between; align-items:baseline;
+  padding:9px 0;
+  border-bottom:1px solid var(--line);
+  gap:12px;
+}
+.kv-row:last-child{ border-bottom:none; }
+.kv-row .k{ font-size:13px; color:var(--muted); }
+.kv-row .v{ font-size:13.5px; font-weight:600; color:var(--ink); text-align:right; font-family:var(--font-mono); }
+
+/* ---------- Badges / pills ---------- */
+.badge{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:5px 11px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:700;
+  font-family:var(--font-mono);
+}
+.badge-dot{ width:7px; height:7px; border-radius:50%; }
+.badge.risk-low{ background:var(--green-tint); color:var(--green); }
+.badge.risk-low .badge-dot{ background:var(--green); }
+.badge.risk-moderate{ background:var(--orange-tint); color:var(--orange); }
+.badge.risk-moderate .badge-dot{ background:var(--orange); }
+.badge.risk-high{ background:var(--red-tint); color:var(--red); }
+.badge.risk-high .badge-dot{ background:var(--red); }
+.badge.neutral{ background:var(--navy-tint); color:var(--navy); }
+.badge.neutral .badge-dot{ background:var(--navy); }
+
+.risk-score-block{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 16px;
+  border-radius:14px;
+}
+.risk-score-block.risk-low{ background:var(--green-tint); }
+.risk-score-block.risk-moderate{ background:var(--orange-tint); }
+.risk-score-block.risk-high{ background:var(--red-tint); }
+.risk-score-block .num{ font-family:var(--font-mono); font-size:26px; font-weight:600; }
+.risk-score-block.risk-low .num{ color:var(--green); }
+.risk-score-block.risk-moderate .num{ color:var(--orange); }
+.risk-score-block.risk-high .num{ color:var(--red); }
+
+/* ---------- Summary tiles (dashboard) ---------- */
+.tile-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.tile{
+  background:var(--white);
+  border:1px solid var(--line);
+  border-radius:var(--radius-md);
+  padding:14px;
+}
+.tile .tile-num{ font-family:var(--font-mono); font-size:24px; font-weight:600; color:var(--navy); }
+.tile .tile-label{ font-size:12px; color:var(--muted); margin-top:2px; }
+
+/* ---------- Toggle switch ---------- */
+.toggle-row{ display:flex; align-items:center; justify-content:space-between; gap:14px; padding:12px 0; border-bottom:1px solid var(--line); }
+.toggle-row:last-child{ border-bottom:none; }
+.toggle-row .lbl{ font-size:13.5px; color:var(--ink); line-height:1.4; }
+.switch{ width:44px; height:26px; border-radius:999px; background:var(--line); position:relative; cursor:pointer; flex:none; transition:background .15s ease; }
+.switch::after{ content:''; position:absolute; top:3px; left:3px; width:20px; height:20px; border-radius:50%; background:var(--white); box-shadow:0 1px 3px rgba(0,0,0,.25); transition:transform .15s ease; }
+.switch.on{ background:var(--navy); }
+.switch.on::after{ transform:translateX(18px); }
+
+/* ---------- OTP / verification dots ---------- */
+.otp-row{ display:flex; gap:9px; justify-content:center; margin:22px 0 6px; }
+.otp-box{
+  width:44px; height:52px;
+  border-radius:12px;
+  border:1.5px solid var(--line);
+  background:var(--white);
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-mono);
+  font-size:20px; font-weight:600;
+  color:var(--navy);
+}
+.dots-row{ display:flex; gap:11px; justify-content:center; margin:22px 0 6px; }
+.dot-box{ width:16px; height:16px; border-radius:50%; background:var(--navy); }
+
+/* ---------- Landing ---------- */
+.landing{
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  background:linear-gradient(165deg, var(--navy) 0%, var(--navy-2) 55%, var(--navy-3) 100%);
+  color:var(--white);
+  padding:0 26px 34px;
+  position:relative;
+  overflow:hidden;
+}
+
+/* ---- decorative backdrop: dot grid + soft colour blobs ---- */
+.landing::before{
+  content:'';
+  position:absolute; inset:0;
+  background-image:radial-gradient(rgba(255,255,255,.14) 1px, transparent 1.4px);
+  background-size:22px 22px;
+  -webkit-mask-image:radial-gradient(ellipse 100% 60% at 50% 30%, #000 40%, transparent 78%);
+          mask-image:radial-gradient(ellipse 100% 60% at 50% 30%, #000 40%, transparent 78%);
+  z-index:0;
+  pointer-events:none;
+}
+.blob{ position:absolute; border-radius:50%; filter:blur(46px); z-index:0; pointer-events:none; }
+.blob-green{ width:190px; height:190px; background:var(--green); opacity:.20; top:-40px; right:-60px; }
+.blob-orange{ width:170px; height:170px; background:var(--orange); opacity:.16; bottom:70px; left:-70px; }
+
+.landing-top{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; position:relative; z-index:2; }
+.landing-actions{ position:relative; z-index:2; }
+
+/* ---- hero illustration: freelancer at work + floating data/skill chips ---- */
+.hero-illustration{
+  position:relative;
+  width:250px; height:186px;
+  display:flex; align-items:center; justify-content:center;
+  margin-bottom:18px;
+}
+.hero-illustration svg{ position:relative; z-index:1; overflow:visible; }
+.hero-chip{
+  position:absolute;
+  background:var(--white);
+  color:var(--ink);
+  border-radius:13px;
+  padding:8px 11px;
+  display:flex; align-items:center; gap:7px;
+  font-size:11px; font-weight:700;
+  box-shadow:0 14px 28px rgba(0,0,0,.28);
+  z-index:4;
+  white-space:nowrap;
+}
+.hero-chip .chip-ic{ width:19px; height:19px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex:none; }
+.hero-chip-verified{ top:2px; right:-6px; transform:rotate(-5deg); }
+.hero-chip-verified .chip-ic{ background:var(--green-tint); color:var(--green); }
+.hero-chip-bank{ bottom:10px; left:-10px; transform:rotate(4deg); }
+.hero-chip-bank .chip-ic{ background:var(--navy-tint); color:var(--navy-3); }
+.hero-chip .chip-sub{ font-weight:500; color:var(--muted); font-size:10px; }
+
+.hero-chip-icon{
+  position:absolute;
+  width:34px; height:34px;
+  border-radius:50%;
+  background:var(--white);
+  color:var(--navy-3);
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 10px 22px rgba(0,0,0,.25);
+  z-index:4;
+}
+.hero-chip-camera{ top:6px; left:2px; }
+.hero-chip-spark{ bottom:30px; right:0; color:var(--orange); }
+
+@media (prefers-reduced-motion: no-preference){
+  .hero-chip-verified{ animation:floatA 4.2s ease-in-out infinite; }
+  .hero-chip-bank{ animation:floatB 4.8s ease-in-out infinite; animation-delay:.5s; }
+  .hero-chip-camera{ animation:floatB 5.2s ease-in-out infinite; animation-delay:.2s; }
+  .hero-chip-spark{ animation:floatA 4.6s ease-in-out infinite; animation-delay:.9s; }
+}
+@keyframes radarPulse{
+  0%{ transform:scale(.85); opacity:.55; }
+  75%{ opacity:0; }
+  100%{ transform:scale(1.9); opacity:0; }
+}
+@keyframes floatA{
+  0%,100%{ transform:translateY(0) rotate(-5deg); }
+  50%{ transform:translateY(-9px) rotate(-3deg); }
+}
+@keyframes floatB{
+  0%,100%{ transform:translateY(0) rotate(4deg); }
+  50%{ transform:translateY(-7px) rotate(6deg); }
+}
+
+.landing h1{
+  font-family:var(--font-display);
+  font-size:32px;
+  font-weight:700;
+  letter-spacing:-.02em;
+  margin:0 0 8px;
+}
+.landing .tag{
+  font-size:14.5px;
+  color:rgba(255,255,255,.72);
+  margin:0;
+}
+.landing-actions{ display:flex; flex-direction:column; gap:10px; }
+.landing .btn-primary{ background:var(--white); color:var(--navy); }
+.landing .btn-secondary{ background:transparent; color:var(--white); border:1.5px solid rgba(255,255,255,.4); }
+.landing .btn-singpass{ background:#EF3E36; color:var(--white); }
+.landing-foot{ text-align:center; font-size:11px; color:rgba(255,255,255,.45); margin-top:16px; font-family:var(--font-mono); letter-spacing:.04em;}
+
+/* ---------- Dashboard header ---------- */
+.dash-head{
+  background:linear-gradient(160deg, var(--navy), var(--navy-3));
+  color:var(--white);
+  padding:18px 18px 22px;
+  border-radius:0 0 24px 24px;
+  position:relative;
+  overflow:hidden;
+}
+.dash-head-pattern{
+  position:absolute; inset:0;
+  background-image:radial-gradient(rgba(255,255,255,.10) 1px, transparent 1.4px);
+  background-size:18px 18px;
+  -webkit-mask-image:linear-gradient(200deg, #000 10%, transparent 62%);
+          mask-image:linear-gradient(200deg, #000 10%, transparent 62%);
+  pointer-events:none;
+}
+.dash-head-row{ position:relative; z-index:1; }
+.dash-head .hello{ font-family:var(--font-display); font-size:21px; font-weight:600; margin:0 0 3px; }
+.dash-head .sub{ font-size:13px; color:rgba(255,255,255,.68); margin:0; }
+.dash-head-row{ display:flex; align-items:center; justify-content:space-between; }
+.avatar-ring{ width:40px; height:40px; border-radius:50%; background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.25); display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:600; font-size:15px; }
+
+.section-title{ font-family:var(--font-display); font-size:15px; font-weight:600; color:var(--navy); margin:22px 0 10px; display:flex; align-items:center; gap:8px; justify-content:space-between; }
+.section-title .st-left{ display:flex; align-items:center; gap:8px; }
+.section-title .st-ic{ width:26px; height:26px; border-radius:8px; background:var(--navy-tint); color:var(--navy-3); display:flex; align-items:center; justify-content:center; flex:none; }
+.section-title .link{ font-family:var(--font-body); font-size:12.5px; font-weight:600; color:var(--navy-3); cursor:pointer; }
+
+/* ---------- Icon lead-in for form-style screens ---------- */
+.screen-lead{ display:flex; align-items:center; gap:12px; margin:2px 0 18px; }
+.screen-lead-ic{
+  width:44px; height:44px; border-radius:13px; flex:none;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--navy-tint); color:var(--navy-3);
+}
+.screen-lead h3{ font-family:var(--font-display); font-size:15.5px; font-weight:600; color:var(--navy); margin:0; }
+.screen-lead p{ font-size:12.5px; color:var(--muted); margin:2px 0 0; }
+
+.invoice-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.invoice-row .name{ font-weight:600; font-size:14px; color:var(--ink); }
+.invoice-row .meta{ font-size:12px; color:var(--muted); margin-top:2px; }
+.invoice-row .amt{ font-family:var(--font-mono); font-weight:600; font-size:14.5px; }
+
+.alert-card{ display:flex; gap:12px; align-items:flex-start; }
+.alert-card{ cursor:pointer; transition:transform .08s ease; }
+.alert-card:active{ transform:scale(.985); }
+.alert-icon{ width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex:none; }
+.alert-icon.risk-moderate{ background:var(--orange-tint); }
+.alert-icon.risk-high{ background:var(--red-tint); }
+.alert-icon.risk-low{ background:var(--green-tint); }
+.alert-title{ font-weight:600; font-size:13.5px; color:var(--ink); margin:0 0 3px; }
+.alert-msg{ font-size:12.5px; color:var(--muted); margin:0; line-height:1.45; }
+
+/* ---------- Checklist ---------- */
+.check-item{ display:flex; align-items:flex-start; gap:9px; padding:7px 0; font-size:13px; color:var(--ink); }
+.check-item svg{ flex:none; margin-top:1px; }
+.risk-check-row{ display:flex; justify-content:space-between; font-size:13px; padding:7px 0; border-bottom:1px dashed var(--line); }
+.risk-check-row:last-of-type{ border-bottom:none; }
+.risk-check-row .pts{ font-family:var(--font-mono); font-weight:600; }
+
+/* ---------- Info / notice boxes ---------- */
+.notice{
+  border-radius:14px;
+  padding:13px 14px;
+  font-size:12.5px;
+  line-height:1.5;
+  display:flex; gap:10px; align-items:flex-start;
+}
+.notice.info{ background:var(--navy-tint); color:var(--navy-2); }
+.notice.warn{ background:var(--orange-tint); color:#8A5A17; }
+.notice.danger{ background:var(--red-tint); color:#992D26; }
+.notice svg{ flex:none; margin-top:1px; }
+
+/* ---------- Checkbox row ---------- */
+.check-row{ display:flex; align-items:flex-start; gap:10px; font-size:12px; color:var(--muted); line-height:1.5; padding:6px 0 18px; }
+.check-box{ width:18px; height:18px; border-radius:5px; background:var(--navy); display:flex; align-items:center; justify-content:center; flex:none; margin-top:1px; }
+
+/* ---------- Radio-style bank list ---------- */
+.bank-option{ display:flex; align-items:center; gap:12px; padding:13px 14px; border:1.5px solid var(--line); border-radius:13px; margin-bottom:9px; cursor:pointer; transition:transform .08s ease, border-color .12s ease; }
+.bank-option:active{ transform:scale(.99); }
+.bank-option.selected{ border-color:var(--navy); background:var(--navy-tint); }
+.bank-option .radio{ width:19px; height:19px; border-radius:50%; border:2px solid var(--muted-2); flex:none; display:flex; align-items:center; justify-content:center; }
+.bank-option.selected .radio{ border-color:var(--navy); }
+.bank-option.selected .radio::after{ content:''; width:10px; height:10px; border-radius:50%; background:var(--navy); }
+.bank-option .bname{ font-weight:600; font-size:14px; }
+
+/* ---------- Subscription card ---------- */
+.sub-card{ background:linear-gradient(150deg, var(--navy), var(--navy-3)); color:var(--white); border-radius:16px; padding:16px; }
+.sub-card .price{ font-family:var(--font-mono); font-size:20px; font-weight:600; }
+.sub-card .desc{ font-size:12.5px; color:rgba(255,255,255,.72); margin:4px 0 12px; }
+.sub-card .btn{ background:var(--white); color:var(--navy); }
+
+/* ---------- Success / decision block ---------- */
+.decision-hero{ text-align:center; padding:22px 10px 6px; }
+.decision-icon{ width:64px; height:64px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 14px; }
+.decision-icon.risk-low{ background:var(--green-tint); }
+.decision-icon.risk-moderate{ background:var(--orange-tint); }
+.decision-icon.risk-high{ background:var(--red-tint); }
+.decision-icon.neutral{ background:var(--navy-tint); }
+.decision-hero h2{ font-family:var(--font-display); font-size:19px; font-weight:600; color:var(--navy); margin:0 0 4px; }
+.decision-hero p{ font-size:13px; color:var(--muted); margin:0; }
+
+/* ---------- Modal / popup ---------- */
+.modal-overlay{
+  position:fixed; inset:0;
+  background:rgba(10,18,36,.55);
+  display:flex; align-items:flex-end; justify-content:center;
+  z-index:1000;
+  animation:fadeIn .18s ease;
+}
+@keyframes fadeIn{ from{opacity:0;} to{opacity:1;} }
+.modal-sheet{
+  width:100%;
+  max-width:390px;
+  background:var(--white);
+  border-radius:26px 26px 0 0;
+  padding:22px 20px 26px;
+  animation:slideUp .22s cubic-bezier(.2,.8,.3,1);
+  position:relative;
+}
+@keyframes slideUp{ from{ transform:translateY(30px); opacity:0;} to{ transform:translateY(0); opacity:1;} }
+.modal-grabber{ width:38px; height:4px; border-radius:99px; background:var(--line); margin:0 auto 16px; }
+.modal-icon{ width:54px; height:54px; border-radius:16px; display:flex; align-items:center; justify-content:center; margin-bottom:14px; box-shadow:0 0 0 8px rgba(0,0,0,.02); }
+.modal-icon.risk-moderate{ background:var(--orange-tint); }
+.modal-icon.risk-high{ background:var(--red-tint); }
+.modal-icon.risk-low{ background:var(--green-tint); }
+.modal-sheet h3{ font-family:var(--font-display); font-size:18px; font-weight:600; color:var(--navy); margin:0 0 6px; }
+.modal-sheet p{ font-size:13.5px; color:var(--ink); margin:0 0 14px; }
+
+/* ---------- Toast ---------- */
+.toast{
+  position:absolute;
+  bottom:22px; left:50%; transform:translateX(-50%);
+  background:var(--navy); color:var(--white);
+  padding:11px 18px; border-radius:99px;
+  font-size:12.5px; font-weight:600;
+  box-shadow:var(--shadow-pop);
+  z-index:1200;
+  display:flex; align-items:center; gap:8px;
+  animation:toastIn .2s ease;
+  white-space:nowrap;
+}
+@keyframes toastIn{ from{opacity:0; transform:translate(-50%,10px);} to{opacity:1; transform:translate(-50%,0);} }
+
+/* ---------- Restart button ---------- */
+.restart-btn{
+  font-family:var(--font-body);
+  font-size:12.5px; font-weight:600;
+  color:var(--navy);
+  background:var(--white);
+  border:1px solid var(--line);
+  padding:9px 16px;
+  border-radius:99px;
+  cursor:pointer;
+  box-shadow:var(--shadow-card);
+  display:flex; align-items:center; gap:6px;
+}
+.restart-btn:hover{ background:var(--navy-tint); }
+
+/* ---------- Divider ---------- */
+.divider-text{ display:flex; align-items:center; gap:10px; color:var(--muted-2); font-size:11.5px; margin:16px 0; }
+.divider-text::before,.divider-text::after{ content:''; flex:1; height:1px; background:var(--line); }
+
+/* ---------- Singpass-style verification panel (generic mock, not the real logo) ---------- */
+.sp-panel{
+  position:relative;
+  overflow:hidden;
+  background:linear-gradient(155deg, #C8352A 0%, #8E1F17 100%);
+  border-radius:20px;
+  padding:26px 20px 22px;
+  color:#fff;
+  text-align:center;
+}
+.sp-panel::before{
+  content:'';
+  position:absolute; inset:0;
+  background-image:radial-gradient(rgba(255,255,255,.10) 1px, transparent 1.4px);
+  background-size:16px 16px;
+  pointer-events:none;
+}
+.sp-scan-wrap{
+  position:relative;
+  width:76px; height:76px;
+  margin:2px auto 12px;
+  display:flex; align-items:center; justify-content:center;
+}
+.sp-ring{
+  position:absolute;
+  width:76px; height:76px;
+  border-radius:50%;
+  border:1.5px solid rgba(255,255,255,.5);
+}
+@media (prefers-reduced-motion: no-preference){
+  .sp-ring{ animation:radarPulse 2.4s ease-out infinite; }
+  .sp-ring.r2{ animation-delay:1.2s; }
+}
+.sp-fingerprint{ position:relative; z-index:2; color:#fff; }
+.sp-wordmark{
+  font-family:var(--font-display);
+  font-weight:700;
+  font-size:15px;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+  position:relative; z-index:1;
+}
+.sp-sub{
+  font-size:11px;
+  color:rgba(255,255,255,.72);
+  margin-top:3px;
+  position:relative; z-index:1;
+}
+.sp-idcard{
+  margin-top:16px;
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.22);
+  border-radius:13px;
+  padding:12px 14px;
+  text-align:left;
+  position:relative; z-index:1;
+}
+.sp-idcard .row{ display:flex; justify-content:space-between; padding:4px 0; font-size:12.5px; }
+.sp-idcard .row .k{ color:rgba(255,255,255,.65); }
+.sp-idcard .row .v{ font-weight:600; font-family:var(--font-mono); }
+.sp-disclaimer{
+  margin-top:14px;
+  font-size:10.5px;
+  line-height:1.5;
+  color:var(--muted-2);
+  text-align:center;
+  padding:0 6px;
+}
+
+/* ---------- Responsive: real mobile becomes full app ---------- */
+@media (max-width: 480px){
+  body{ align-items:stretch; }
+  .stage{ padding:0; gap:0; min-height:100vh; }
+  .stage-label{ display:none; }
+  .app-wrap{ width:100vw; height:100vh; height:100dvh; }
+  .phone{ border-radius:0; box-shadow:none; }
+  .notch{ display:none; }
+  .restart-btn{ position:fixed; top:10px; right:10px; z-index:1300; opacity:.85; padding:7px 12px; font-size:11px;}
+}
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="stage-label">
+    <span class="stage-eyebrow">C369 · FINANCIAL TECHNOLOGIES · REGTECH FA PROTOTYPE</span>
+    <h1>SecurePay</h1>
+    <p>Payment monitoring &amp; fraud prevention for freelancers and gig workers</p>
+  </div>
+
+  <div class="app-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="statusbar">
+        <span class="time">9:41</span>
+        <span class="icons">
+          <svg width="16" height="11" viewBox="0 0 16 11" fill="none"><rect x="0" y="6" width="3" height="5" rx="0.5" fill="currentColor"/><rect x="4.5" y="4" width="3" height="7" rx="0.5" fill="currentColor"/><rect x="9" y="2" width="3" height="9" rx="0.5" fill="currentColor"/><rect x="13" y="0" width="3" height="11" rx="0.5" fill="currentColor"/></svg>
+          <svg width="22" height="11" viewBox="0 0 22 11" fill="none"><rect x="0.5" y="0.5" width="18" height="10" rx="2.5" stroke="currentColor"/><rect x="2" y="2" width="15" height="7" rx="1.2" fill="currentColor"/><rect x="20" y="3.5" width="1.5" height="4" rx="0.7" fill="currentColor"/></svg>
+        </span>
+      </div>
+      <div class="appheader" id="appheader"></div>
+      <div class="appcontent" id="appcontent"></div>
+    </div>
+  </div>
+
+  <button class="restart-btn" onclick="resetApp()">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 4v6h6"/><path d="M3.5 15a9 9 0 1 0 2-9.4L1 10"/></svg>
+    Restart demo
+  </button>
+</div>
+
+<div id="modalroot"></div>
+
+<script>
+/* =========================================================
+   SecurePay — Clickable Prototype
+   C369 Financial Technologies — RegTech FA Prototype
+   Pure vanilla JS. All data is prefilled / simulated.
+   No real auth, banking, or backend — demo only.
+   ========================================================= */
+
+/* ---------------- Sample data (prefilled) ---------------- */
+const DATA = {
+  user:{
+    name:"Sarah Lim",
+    email:"sarahlim14@gmail.com",
+    password:"SecurePay123",
+    phone:"91234567",
+    nric:"S****1234A",
+    dob:"12 March 1990",
+    country:"Singapore",
+    initials:"SL"
+  },
+  banks:["DBS","UOB","OCBC","Standard Chartered"],
+  selectedBank:"DBS",
+  invoices:{
+    "SP-1003":{client:"Rachel Koh", service:"Makeup Session", amount:600, received:600, due:"—", paidDate:"10 July 2026", status:"Paid", risk:10, level:"low", origin:"Singapore"},
+    "SP-1004":{client:"—", service:"—", amount:800, received:0, due:"18 July 2026", status:"Overdue", risk:35, level:"moderate"},
+    "SP-1005":{client:"June Tan", service:"Bridal Makeup", amount:800, received:600, due:"18 July 2026", status:"Awaiting Payment", risk:45, level:"moderate", ref:"SP-1005", contact:"WhatsApp"},
+    "SP-1006":{client:"Unknown client", service:"—", amount:800, received:1500, due:"—", status:"Under Review", risk:50, level:"moderate"}
+  },
+  alerts:[
+    {id:"a1", type:"underpay", title:"Underpayment Detected", msg:"Payment for Invoice SP-1005 is S$200 below the invoiced amount.", level:"moderate"},
+    {id:"a2", type:"overpay", title:"Overpayment Detected", msg:"Payment for Invoice SP-1006 is S$700 above the invoiced amount.", level:"moderate"},
+    {id:"a3", type:"overdue", title:"Payment Overdue", msg:"Invoice SP-1004 is overdue by two days.", level:"moderate"},
+    {id:"a4", type:"local_mismatch", title:"Unmatched Local Payment", msg:"A local payment of S$150 doesn't match any invoice on file.", level:"moderate"},
+    {id:"a5", type:"suspicious", title:"Suspicious Payment Detected", msg:"An overseas payment of S$4,500 has no matching invoice.", level:"high"}
+  ]
+};
+
+/* ---------------- App state ---------------- */
+const APP = {
+  current:"landing",
+  history:[],
+  modal:null
+};
+
+/* ---------------- Small helpers ---------------- */
+function money(n){ return "S$" + Number(n).toLocaleString("en-SG"); }
+
+function go(screen){
+  APP.history.push(APP.current);
+  APP.current = screen;
+  render();
+  const c = document.getElementById("appcontent");
+  if(c) c.scrollTop = 0;
+}
+function goReplace(screen){ // navigate without adding a back-step (used after terminal confirmations)
+  APP.current = screen;
+  render();
+  const c = document.getElementById("appcontent");
+  if(c) c.scrollTop = 0;
+}
+function back(){
+  if(APP.history.length){
+    APP.current = APP.history.pop();
+    render();
+  }
+}
+function resetApp(){
+  APP.current = "landing";
+  APP.history = [];
+  APP.modal = null;
+  render();
+  closeModal(true);
+}
+function openModal(name){
+  APP.modal = name;
+  renderModal();
+}
+function closeModal(silent){
+  APP.modal = null;
+  const root = document.getElementById("modalroot");
+  if(root) root.innerHTML = "";
+}
+function toast(msg){
+  const phone = document.querySelector(".phone");
+  if(!phone) return;
+  const old = phone.querySelector(".toast");
+  if(old) old.remove();
+  const el = document.createElement("div");
+  el.className = "toast";
+  el.innerHTML = msg;
+  phone.appendChild(el);
+  setTimeout(()=>{ el.remove(); }, 2200);
+}
+function toggleSwitch(el){ el.classList.toggle("on"); }
+function selectBank(name){
+  DATA.selectedBank = name;
+  render();
+}
+
+/* ---------------- Icon set (inline SVG, currentColor) ---------------- */
+const ICON = {
+  back:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>`,
+  chevronRight:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>`,
+  check:`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>`,
+  checkCircle:(size=32)=>`<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg>`,
+  xCircle:(size=32)=>`<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5l5 5"/><path d="M14.5 9.5l-5 5"/></svg>`,
+  alertTriangle:(size=28)=>`<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>`,
+  alertOctagon:(size=28)=>`<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>`,
+  clock:(size=28)=>`<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>`,
+  shield:(size=28)=>`<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.4 8.4-8 10-4.6-1.6-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg>`,
+  bank:(size=22)=>`<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M4 10h16"/><path d="M6 10v8"/><path d="M10 10v8"/><path d="M14 10v8"/><path d="M18 10v8"/><path d="M2 10l10-6 10 6"/></svg>`,
+  bell:(size=18)=>`<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>`,
+  lock:(size=16)=>`<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`,
+  info:(size=16)=>`<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5"/><path d="M12 8h.01"/></svg>`,
+  fileText:(size=18)=>`<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>`,
+  send:(size=17)=>`<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></svg>`,
+  phoneCall:(size=17)=>`<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .3 2 .7 2.9a2 2 0 0 1-.4 2.1L8.1 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.4 1.9.6 2.9.7a2 2 0 0 1 1.7 2z"/></svg>`,
+  logo:(size=30)=>`<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.4 8.4-8 10-4.6-1.6-8-5-8-10V6z"/><path d="M9 12.5l2 2 4.5-4.5"/></svg>`,
+  fingerprint:(size=32)=>`<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10a3 3 0 0 1 3 3c0 2.5-.8 4-1.3 5.3"/><path d="M8.7 19c-.7-1.6-1.2-3-1.2-6a4.5 4.5 0 0 1 4.5-4.5"/><path d="M12 5.5a7.5 7.5 0 0 1 7.5 7.5c0 1.5-.2 2.7-.5 3.8"/><path d="M4.5 16a12 12 0 0 1-.8-4.5A8.3 8.3 0 0 1 12 3.2c1 0 1.9.15 2.8.44"/><path d="M17.8 20c.3-.6.5-1.1.7-1.7"/><path d="M2.5 12.8A9.5 9.5 0 0 1 12 1.8c1.2 0 2.4.2 3.5.6"/></svg>`,
+  camera:(size=16)=>`<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>`,
+  sparkle:(size=16)=>`<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.2 6.8L21 11l-6.8 2.2L12 20l-2.2-6.8L3 11l6.8-2.2z"/></svg>`
+};
+
+/* ---------------- UI component builders ---------------- */
+function btn(label, onclick, variant="primary", extraClass=""){
+  return `<button class="btn btn-${variant} ${extraClass}" onclick="${onclick}">${label}</button>`;
+}
+function riskBadge(level, scoreText){
+  const label = level==="low"?"Low Risk":level==="moderate"?"Moderate Risk":"High Risk";
+  return `<span class="badge risk-${level}"><span class="badge-dot"></span>${scoreText?scoreText+" · ":""}${label}</span>`;
+}
+function riskScoreBlock(score,level){
+  const label = level==="low"?"Low Risk":level==="moderate"?"Moderate Risk":"High Risk";
+  return `<div class="risk-score-block risk-${level}">
+    <div><div class="eyebrow" style="color:inherit;opacity:.75">Risk score</div><div class="num">${score}/100</div></div>
+    <div class="badge risk-${level}"><span class="badge-dot"></span>${label}</div>
+  </div>`;
+}
+function kv(k,v){ return `<div class="kv-row"><span class="k">${k}</span><span class="v">${v}</span></div>`; }
+function riskCheckRow(label, pts){ return `<div class="risk-check-row"><span>${label}</span><span class="pts">${pts>0?"+":""}${pts}</span></div>`; }
+function toggleRow(label, on, id){
+  return `<div class="toggle-row"><span class="lbl">${label}</span><div id="${id}" class="switch ${on?"on":""}" onclick="toggleSwitch(this)"></div></div>`;
+}
+function notice(kind, iconHtml, text){
+  return `<div class="notice ${kind}">${iconHtml}<span>${text}</span></div>`;
+}
+function card(inner, extraClass=""){ return `<div class="card ${extraClass}">${inner}</div>`; }
+function sectionTitle(iconHtml, label, linkHtml=""){
+  return `<div class="section-title"><span class="st-left"><span class="st-ic">${iconHtml}</span>${label}</span>${linkHtml}</div>`;
+}
+
+/* ---------------- Header + screen meta ---------------- */
+const NO_CHROME = ["landing","dashboard"]; // screens that render their own full header
+
+const META = {
+  manualLogin:{title:"Log In"},
+  otp:{title:"Verify Your Login"},
+  forgotPassword:{title:"Reset Password"},
+  singpassReturning:{title:"Log In with Singpass"},
+  singpassVerifiedReturning:{title:"Login Verified"},
+  createAccount:{title:"Create Account"},
+  myInfoConsent:{title:"MyInfo Consent"},
+  singpassNew:{title:"Verify Your Identity"},
+  identityVerified:{title:"Identity Verified"},
+  identityRejected:{title:"Verification Failed"},
+  connectBank:{title:"Connect Bank"},
+  bankConnected:{title:"Bank Connected"},
+  paymentAlerts:{title:"Payment Alerts"},
+  createInvoice:{title:"Create Invoice"},
+  invoiceCreated:{title:"Invoice Created"},
+  allInvoices:{title:"All Invoices"},
+  allAlerts:{title:"Payment Alerts"},
+  invoicePaidDetails:{title:"Payment Verified"},
+  invoicePendingDetails:{title:"Invoice Details"},
+  underpaymentDetails:{title:"Underpayment Details"},
+  overpaymentDetails:{title:"Overpayment Details"},
+  overdueDetails:{title:"Overdue Payment"},
+  suspiciousDetails:{title:"Suspicious Payment"},
+  contactClient:{title:"Contact Client"},
+  contactBank:{title:"Contact Bank"},
+  shareInvoice:{title:"Share Invoice"}
+};
+
+function renderHeader(){
+  const header = document.getElementById("appheader");
+  if(NO_CHROME.includes(APP.current)){
+    header.className = "appheader";
+    header.innerHTML = "";
+    return;
+  }
+  const meta = META[APP.current] || {title:""};
+  header.className = "appheader bordered";
+  header.innerHTML = `
+    <div class="back-btn" onclick="back()">${ICON.back}</div>
+    <h2>${meta.title}</h2>
+  `;
+}
+
+/* ---------------- Render engine ---------------- */
+function render(){
+  renderHeader();
+  const content = document.getElementById("appcontent");
+  const fn = SCREENS[APP.current] || SCREENS.landing;
+  content.innerHTML = fn();
+}
+
+/* Expose state on window — handy for debugging in devtools (window.APP, window.DATA) */
+window.APP = APP;
+window.DATA = DATA;
+/* =========================================================
+   Screen templates — Part 1: Auth, onboarding, banking
+   ========================================================= */
+
+function toDashboard(){
+  APP.history = [];
+  APP.current = "dashboard";
+  render();
+}
+
+function sendReminder(){
+  toast(`${ICON.check} Reminder sent to client`);
+  setTimeout(toDashboard, 1000);
+}
+function callBank(){
+  toast(`${ICON.phoneCall} Connecting to bank support (simulated)`);
+}
+function startTrial(){
+  toast(`${ICON.check} 14-day free trial started`);
+}
+function resendOtp(){
+  toast(`${ICON.check} Code resent to ${DATA.user.email}`);
+}
+function shareInvoiceAction(channel){
+  toast(`${ICON.check} Invoice shared via ${channel} (simulated)`);
+}
+function dismissAlert(){
+  closeModal();
+  toast("Alert dismissed");
+}
+function markLocalPersonal(){
+  toast(`${ICON.check} Marked as a personal transfer — won't count toward fraud risk`);
+  setTimeout(toDashboard, 1100);
+}
+function viewFromModal(screen){
+  closeModal();
+  go(screen);
+}
+
+const SCREENS = {};
+
+/* ---------------- 1. Landing ---------------- */
+SCREENS.landing = () => `
+  <div class="landing">
+    <div class="blob blob-green"></div>
+    <div class="blob blob-orange"></div>
+    <div class="landing-top">
+      <div class="hero-illustration">
+        <svg width="250" height="186" viewBox="0 0 250 186">
+          <ellipse cx="125" cy="176" rx="105" ry="7" fill="rgba(255,255,255,.06)"/>
+
+          <!-- desk + laptop -->
+          <rect x="148" y="118" width="88" height="9" rx="4.5" fill="rgba(255,255,255,.18)"/>
+          <rect x="156" y="127" width="5" height="32" fill="rgba(255,255,255,.12)"/>
+          <rect x="220" y="127" width="5" height="32" fill="rgba(255,255,255,.12)"/>
+          <path d="M160 118 L230 118 L236 125 L154 125 Z" fill="#E7E9EE"/>
+          <rect x="166" y="78" width="58" height="40" rx="4" fill="#F5F6F8"/>
+          <rect x="170" y="82" width="50" height="30" rx="2" fill="#0B1F3F"/>
+          <rect x="175" y="100" width="5" height="9" rx="1" fill="#1D9E6D"/>
+          <rect x="183" y="94" width="5" height="15" rx="1" fill="#1D9E6D" opacity=".82"/>
+          <rect x="191" y="88" width="5" height="21" rx="1" fill="#1D9E6D" opacity=".62"/>
+          <circle cx="207" cy="92" r="7.5" fill="none" stroke="#fff" stroke-width="1.4"/>
+          <path d="M203.5 92l2.3 2.6 4.7-5.4" stroke="#fff" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+          <!-- sync line from phone to laptop -->
+          <path d="M120 128 Q140 110 168 100" stroke="rgba(255,255,255,.32)" stroke-width="1.4" stroke-dasharray="3 4" fill="none"/>
+
+          <!-- stool -->
+          <rect x="55" y="150" width="42" height="8" rx="4" fill="rgba(255,255,255,.16)"/>
+          <rect x="61" y="158" width="5" height="16" fill="rgba(255,255,255,.11)"/>
+          <rect x="86" y="158" width="5" height="16" fill="rgba(255,255,255,.11)"/>
+
+          <!-- person -->
+          <path d="M45 152 Q45 100 76 100 Q107 100 107 152 Z" fill="#5B8A9A"/>
+          <path d="M64 104 Q76 116 88 104" stroke="#4A7686" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <path d="M50 118 Q38 132 46 150" stroke="#5B8A9A" stroke-width="11" fill="none" stroke-linecap="round"/>
+          <circle cx="47" cy="151" r="6" fill="#F4C77A"/>
+          <path d="M100 116 Q116 122 112 140" stroke="#5B8A9A" stroke-width="11" fill="none" stroke-linecap="round"/>
+          <circle cx="76" cy="80" r="18" fill="#F4C77A"/>
+          <path d="M58 76 Q58 52 76 52 Q94 52 94 76 Q86 62 76 62 Q66 62 58 76Z" fill="#2A2A38"/>
+
+          <!-- phone in hand -->
+          <rect x="103" y="118" width="20" height="34" rx="4" fill="#fff"/>
+          <rect x="106" y="122" width="14" height="23" rx="1.5" fill="#0B1F3F"/>
+          <path d="M110 134l2.4 2.6 4.6-5.6" stroke="#1D9E6D" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+
+        <div class="hero-chip-icon hero-chip-camera">${ICON.camera(15)}</div>
+        <div class="hero-chip-icon hero-chip-spark">${ICON.sparkle(15)}</div>
+        <div class="hero-chip hero-chip-verified">
+          <span class="chip-ic">${ICON.check}</span>
+          <span>Payment verified</span>
+        </div>
+        <div class="hero-chip hero-chip-bank">
+          <span class="chip-ic">${ICON.bank(11)}</span>
+          <span>Bank connected</span>
+        </div>
+      </div>
+      <h1>SecurePay</h1>
+      <p class="tag">Safe payments for freelancers</p>
+    </div>
+    <div class="landing-actions">
+      ${btn("Create Account", "go('createAccount')", "primary")}
+      ${btn("Log In", "go('manualLogin')", "secondary")}
+      <button class="btn btn-singpass" onclick="go('singpassReturning')" style="gap:9px">${ICON.fingerprint(17)} Log In with Singpass</button>
+    </div>
+  </div>
+`;
+
+/* ---------------- 2. Manual login ---------------- */
+SCREENS.manualLogin = () => `
+  <div class="screen-pad">
+    <p class="muted small" style="margin-top:4px">Log in to your SecurePay account.</p>
+    <div class="field">
+      <label>Email</label>
+      <input class="input" type="text" value="${DATA.user.email}" readonly>
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input class="input" type="password" value="${DATA.user.password}" readonly>
+    </div>
+    ${btn("Log In", "go('otp')", "primary")}
+    <div style="text-align:center;margin-top:6px">
+      <span class="btn-ghost" style="display:inline;cursor:pointer;font-size:13px" onclick="go('forgotPassword')">Forgot Password?</span>
+    </div>
+  </div>
+`;
+
+/* ---------------- 3. In-app OTP ---------------- */
+SCREENS.otp = () => `
+  <div class="screen-pad">
+    <p class="muted small">A verification code was sent to <strong style="color:var(--ink)">${DATA.user.email}</strong></p>
+    <div class="otp-row">
+      ${["1","4","2","0","0","7"].map(d=>`<div class="otp-box">${d}</div>`).join("")}
+    </div>
+    <div style="text-align:center;margin-bottom:20px">
+      <span class="small muted" style="cursor:pointer;text-decoration:underline" onclick="resendOtp()">Resend code</span>
+    </div>
+    ${btn("Verify and Continue", "go('dashboard')", "primary")}
+  </div>
+`;
+
+/* ---------------- Forgot password ---------------- */
+SCREENS.forgotPassword = () => `
+  <div class="screen-pad" id="fpwrap">
+    <p class="muted small">Enter your account email and we'll send reset instructions.</p>
+    <div class="field">
+      <label>Email</label>
+      <input class="input" type="text" value="${DATA.user.email}" readonly>
+    </div>
+    <div id="fp-action">
+      ${btn("Send Reset Link", "handleForgotPassword()", "primary")}
+    </div>
+  </div>
+`;
+function handleForgotPassword(){
+  document.getElementById("fp-action").innerHTML = `
+    ${notice("info", ICON.info(16), "If an account exists for this email, password reset instructions have been sent. For your security, we don't confirm which emails are registered.")}
+    <div style="margin-top:14px">${btn("Back to Log In", "go('manualLogin')", "secondary")}</div>
+  `;
+}
+
+/* ---------------- Shared Singpass mock panel (generic icon + brand colour, not the real logo) ---------------- */
+function spVerifyPanel(subtitle){
+  return `
+    <div class="sp-panel">
+      <div class="sp-scan-wrap">
+        <div class="sp-ring"></div>
+        <div class="sp-ring r2"></div>
+        <div class="sp-fingerprint">${ICON.fingerprint(30)}</div>
+      </div>
+      <div class="sp-wordmark">Singpass</div>
+      <div class="sp-sub">${subtitle}</div>
+      <div class="sp-idcard">
+        <div class="row"><span class="k">Name</span><span class="v">${DATA.user.name}</span></div>
+        <div class="row"><span class="k">Masked NRIC</span><span class="v">${DATA.user.nric}</span></div>
+      </div>
+    </div>
+  `;
+}
+
+/* ---------------- Singpass returning-user login ---------------- */
+SCREENS.singpassReturning = () => `
+  <div class="screen-pad">
+    ${spVerifyPanel("National Digital Identity · Verification requested by SecurePay")}
+    <div style="margin-top:16px">
+      ${btn("Verify with Singpass", "go('singpassVerifiedReturning')", "primary")}
+    </div>
+  </div>
+`;
+
+SCREENS.singpassVerifiedReturning = () => `
+  <div class="screen-pad">
+    <div class="decision-hero">
+      <div class="decision-icon risk-low" style="color:var(--green)">${ICON.checkCircle(30)}</div>
+      <h2>Login Verified</h2>
+      <p>Your identity has been confirmed via Singpass.</p>
+    </div>
+    <div style="margin-top:18px">
+      ${btn("Continue to SecurePay", "go('dashboard')", "primary")}
+    </div>
+  </div>
+`;
+
+/* ---------------- Create account ---------------- */
+SCREENS.createAccount = () => `
+  <div class="screen-pad">
+    <div class="field"><label>Full Name</label><input class="input" value="${DATA.user.name}" readonly></div>
+    <div class="field"><label>Email</label><input class="input" value="${DATA.user.email}" readonly></div>
+    <div class="field"><label>Phone Number</label><input class="input" value="+65 ${DATA.user.phone}" readonly></div>
+    <div class="field"><label>Password</label><input class="input" type="password" value="${DATA.user.password}" readonly></div>
+    <div class="field"><label>Confirm Password</label><input class="input" type="password" value="${DATA.user.password}" readonly></div>
+    <div class="check-row">
+      <div class="check-box" style="color:#fff">${ICON.check}</div>
+      <span>I agree to the Terms of Service and Privacy Policy</span>
+    </div>
+    ${btn("Sign Up", "go('myInfoConsent')", "primary")}
+  </div>
+`;
+
+/* ---------------- MyInfo consent ---------------- */
+SCREENS.myInfoConsent = () => `
+  <div class="screen-pad">
+    <p class="muted small">SecurePay is requesting the following details from MyInfo:</p>
+    ${card(`
+      <div class="check-item"><span style="color:var(--navy-3)">${ICON.check}</span> Full Name</div>
+      <div class="check-item"><span style="color:var(--navy-3)">${ICON.check}</span> Masked NRIC</div>
+      <div class="check-item"><span style="color:var(--navy-3)">${ICON.check}</span> Date of Birth</div>
+      <div class="check-item"><span style="color:var(--navy-3)">${ICON.check}</span> Registered Country</div>
+    `)}
+    <div style="margin-top:12px">
+      ${notice("info", ICON.info(16), "This information will only be used for identity verification.")}
+    </div>
+    <div style="margin-top:16px">
+      ${btn("Agree and Continue", "go('singpassNew')", "primary")}
+    </div>
+  </div>
+`;
+
+/* ---------------- New-user Singpass verification ---------------- */
+SCREENS.singpassNew = () => `
+  <div class="screen-pad">
+    ${spVerifyPanel("National Digital Identity · Identity verification for onboarding")}
+    <div style="margin-top:16px">
+      ${btn("Verify with Singpass", "go('identityVerified')", "primary")}
+    </div>
+    <div style="text-align:center;margin-top:10px">
+      <span class="small muted" style="cursor:pointer;text-decoration:underline" onclick="go('identityRejected')">Demo: simulate a rejected verification</span>
+    </div>
+  </div>
+`;
+
+/* ---------------- Identity verified ---------------- */
+SCREENS.identityVerified = () => `
+  <div class="screen-pad">
+    <div class="decision-hero">
+      <div class="decision-icon risk-low" style="color:var(--green)">${ICON.checkCircle(30)}</div>
+      <h2>Identity Verified</h2>
+    </div>
+    ${card(`
+      ${kv("Name", DATA.user.name)}
+      ${kv("Masked NRIC", DATA.user.nric)}
+      ${kv("Date of Birth", DATA.user.dob)}
+      ${kv("Registered Country", DATA.user.country)}
+      ${kv("Decision", `<span class="badge risk-low"><span class="badge-dot"></span>Approved</span>`)}
+    `)}
+    <div style="margin-top:16px">${btn("Continue", "go('connectBank')", "primary")}</div>
+  </div>
+`;
+
+/* ---------------- Identity rejected (onboarding-level reject — SecurePay's own KYC, not the bank's) ---------------- */
+SCREENS.identityRejected = () => `
+  <div class="screen-pad">
+    <div class="decision-hero">
+      <div class="decision-icon risk-high" style="color:var(--red)">${ICON.xCircle(30)}</div>
+      <h2>Verification Failed</h2>
+    </div>
+    ${card(`
+      ${kv("Name", DATA.user.name)}
+      ${kv("Masked NRIC", DATA.user.nric)}
+      ${kv("Verification Result","Failed")}
+      ${kv("Reason","NRIC already linked to an existing SecurePay account")}
+      ${kv("Decision", `<span class="badge risk-high"><span class="badge-dot"></span>Rejected</span>`)}
+    `)}
+    <div style="margin-top:12px">
+      ${notice("danger", ICON.alertOctagon(16), "For your security, SecurePay only allows one account per verified identity. This check runs on SecurePay's own user records — it's separate from your bank's account verification.")}
+    </div>
+    <div class="btn-block-row" style="margin-top:16px">
+      ${btn("Try Again","go('myInfoConsent')","secondary")}
+      ${btn("Log In Instead","go('manualLogin')","primary")}
+    </div>
+  </div>
+`;
+
+/* ---------------- Connect bank ---------------- */
+SCREENS.connectBank = () => `
+  <div class="screen-pad">
+    <div class="screen-lead">
+      <div class="screen-lead-ic">${ICON.bank(21)}</div>
+      <div>
+        <h3>Link your bank</h3>
+        <p>Read-only access, for payment monitoring only</p>
+      </div>
+    </div>
+    ${DATA.banks.map(b=>`
+      <div class="bank-option ${DATA.selectedBank===b?"selected":""}" onclick="selectBank('${b}')">
+        <div class="radio"></div>
+        <span class="bname">${b}</span>
+      </div>
+    `).join("")}
+    <div style="margin:14px 0">
+      ${notice("info", ICON.lock(16), "SecurePay uses read-only access to retrieve transaction information for payment monitoring. SecurePay cannot transfer or withdraw money.")}
+    </div>
+    ${btn("Connect Securely", "go('bankConnected')", "primary")}
+  </div>
+`;
+
+SCREENS.bankConnected = () => `
+  <div class="screen-pad">
+    <div class="decision-hero">
+      <div class="decision-icon risk-low" style="color:var(--green)">${ICON.checkCircle(30)}</div>
+      <h2>Bank Account Connected</h2>
+      <p>${DATA.selectedBank} Savings Account</p>
+    </div>
+    ${card(`
+      ${kv("Account", "****1234")}
+      ${kv("Access", "Read-only")}
+    `)}
+    <div style="margin-top:12px">${notice("info", ICON.info(16), "SecurePay can now compare verified bank transactions with your invoices.")}</div>
+    <div style="margin-top:16px">${btn("Continue", "go('paymentAlerts')", "primary")}</div>
+  </div>
+`;
+
+/* ---------------- Payment alerts setup ---------------- */
+SCREENS.paymentAlerts = () => `
+  <div class="screen-pad">
+    <div class="screen-lead">
+      <div class="screen-lead-ic">${ICON.bell(20)}</div>
+      <div>
+        <h3>Set your payment alerts</h3>
+        <p>Choose when SecurePay should notify you</p>
+      </div>
+    </div>
+    ${card(`
+      ${toggleRow("Alert me when payment is below the invoiced amount", true, "tg1")}
+      ${toggleRow("Alert me when payment is above the invoiced amount", true, "tg2")}
+      <div class="toggle-row" style="display:block">
+        <div class="lbl" style="margin-bottom:8px">Alert me when payment is overdue</div>
+        <select class="input">
+          <option>Same day as due date</option>
+          <option selected>1 day after due date</option>
+          <option>3 days after due date</option>
+          <option>7 days after due date</option>
+        </select>
+      </div>
+    `)}
+    ${card(`
+      ${toggleRow("Alert me when no matching invoice is found — including local payments", true, "tg3")}
+      <div class="toggle-row" style="display:block; border-bottom:none">
+        <div class="lbl" style="margin-bottom:8px">Home-base country</div>
+        <select class="input">
+          <option selected>Singapore</option>
+          <option>Malaysia</option>
+          <option>Indonesia</option>
+          <option>Other</option>
+        </select>
+      </div>
+      ${toggleRow("Increase risk level for unmatched payments from outside my home-base country", true, "tg4")}
+      <div style="margin-top:4px">
+        ${notice("info", ICON.info(16), "Every unmatched payment triggers a review-level alert on its own — even a local one — since it might still be a client payment you haven't invoiced yet. It only escalates to <strong>High Risk</strong> when it's also from outside your home-base country.")}
+      </div>
+    `)}
+    <div class="sub-card" style="margin-top:14px">
+      <div class="eyebrow" style="color:rgba(255,255,255,.65)">SecurePay Pro</div>
+      <div class="price">S$6.90/month</div>
+      <div class="desc">All fraud-monitoring, risk-scoring and payment-alert features included.</div>
+      ${btn("Start 14-Day Free Trial", "startTrial()", "primary")}
+    </div>
+    <div style="margin-top:16px">${btn("Save and Continue", "go('createInvoice')", "primary")}</div>
+  </div>
+`;
+
+/* ---------------- Create first invoice ---------------- */
+SCREENS.createInvoice = () => `
+  <div class="screen-pad">
+    <div class="screen-lead">
+      <div class="screen-lead-ic">${ICON.fileText(19)}</div>
+      <div>
+        <h3>Create your first invoice</h3>
+        <p>SecurePay will track this against incoming payments</p>
+      </div>
+    </div>
+    <div class="field"><label>Client</label><input class="input" value="June Tan" readonly></div>
+    <div class="field"><label>Service</label><input class="input" value="Bridal Makeup" readonly></div>
+    <div class="field"><label>Amount</label><input class="input" value="S$800" readonly></div>
+    <div class="field"><label>Due Date</label><input class="input" value="18 July 2026" readonly></div>
+    <div class="field"><label>Invoice Reference</label><input class="input" value="SP-1005" readonly></div>
+    <div class="field"><label>Client Contact</label><input class="input" value="WhatsApp" readonly></div>
+    ${btn("Create Invoice", "go('invoiceCreated')", "primary")}
+  </div>
+`;
+
+SCREENS.invoiceCreated = () => `
+  <div class="screen-pad">
+    <div class="decision-hero">
+      <div class="decision-icon risk-low" style="color:var(--green)">${ICON.checkCircle(30)}</div>
+      <h2>Invoice SP-1005 Created</h2>
+      <p><span class="badge neutral"><span class="badge-dot"></span>Awaiting Payment</span></p>
+    </div>
+    <div style="margin-top:8px">${notice("info", ICON.info(16), "SecurePay will monitor your connected bank transactions and alert you if the payment needs attention.")}</div>
+    <div class="btn-block-row" style="margin-top:16px">
+      ${btn("Share Invoice", "go('shareInvoice')", "secondary")}
+      ${btn("Go to Dashboard", "toDashboard()", "primary")}
+    </div>
+  </div>
+`;
+
+SCREENS.shareInvoice = () => `
+  <div class="screen-pad">
+    <p class="muted small">Share invoice <strong style="color:var(--ink)">SP-1005</strong> with your client.</p>
+    <div class="card" style="cursor:pointer;margin-bottom:10px" onclick="shareInvoiceAction('WhatsApp')">
+      <div class="invoice-row"><span class="name">Share via WhatsApp</span>${ICON.chevronRight}</div>
+    </div>
+    <div class="card" style="cursor:pointer;margin-bottom:10px" onclick="shareInvoiceAction('Email')">
+      <div class="invoice-row"><span class="name">Share via Email</span>${ICON.chevronRight}</div>
+    </div>
+    <div class="card" style="cursor:pointer" onclick="shareInvoiceAction('Link copy')">
+      <div class="invoice-row"><span class="name">Copy Invoice Link</span>${ICON.chevronRight}</div>
+    </div>
+  </div>
+`;
+/* =========================================================
+   Screen templates — Part 2: Dashboard, invoices, alerts
+   ========================================================= */
+
+const ALERT_ICON = {
+  underpay:{icon:ICON.alertTriangle(20), level:"moderate"},
+  overpay:{icon:ICON.alertTriangle(20), level:"moderate"},
+  overdue:{icon:ICON.clock(20), level:"moderate"},
+  local_mismatch:{icon:ICON.alertTriangle(20), level:"moderate"},
+  suspicious:{icon:ICON.alertOctagon(20), level:"high"}
+};
+const ALERT_MODAL = { underpay:"underpayment", overpay:"overpayment", overdue:"overdue", local_mismatch:"localMismatch", suspicious:"suspicious" };
+const ALERT_DETAIL_SCREEN = { underpay:"underpaymentDetails", overpay:"overpaymentDetails", overdue:"overdueDetails", local_mismatch:"localMismatchDetails", suspicious:"suspiciousDetails" };
+
+function alertCard(a, clickable=true){
+  const meta = ALERT_ICON[a.type];
+  return `
+    <div class="card alert-card" ${clickable?`style="cursor:pointer" onclick="openModal('${ALERT_MODAL[a.type]}')"`:""}>
+      <div class="alert-icon risk-${meta.level}" style="color:var(--${meta.level==='high'?'red':'orange'})">${meta.icon}</div>
+      <div style="flex:1">
+        <p class="alert-title">${a.title}</p>
+        <p class="alert-msg">${a.msg}</p>
+      </div>
+      ${btn("View", `openModal('${ALERT_MODAL[a.type]}')`, "secondary", "btn-sm")}
+    </div>
+  `;
+}
+
+/* ---------------- Dashboard ---------------- */
+SCREENS.dashboard = () => `
+  <div class="dash-head">
+    <div class="dash-head-pattern"></div>
+    <div class="dash-head-row">
+      <div>
+        <p class="hello">Hello ${DATA.user.name.split(" ")[0]}</p>
+        <p class="sub">Here's what's happening with your payments.</p>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="position:relative;cursor:pointer" onclick="go('allAlerts')">
+          <div class="avatar-ring" style="width:36px;height:36px">${ICON.bell(17)}</div>
+          <div style="position:absolute;top:-3px;right:-3px;background:var(--red);color:#fff;font-size:9px;font-weight:700;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono)">${DATA.alerts.length}</div>
+        </div>
+        <div class="avatar-ring">${DATA.user.initials}</div>
+      </div>
+    </div>
+  </div>
+  <div class="screen-pad">
+    <div class="tile-grid">
+      <div class="tile"><div class="tile-num" style="color:var(--navy-3)">1</div><div class="tile-label">Awaiting Payment</div></div>
+      <div class="tile"><div class="tile-num" style="color:var(--green)">1</div><div class="tile-label">Paid</div></div>
+      <div class="tile"><div class="tile-num" style="color:var(--orange)">1</div><div class="tile-label">Overdue</div></div>
+      <div class="tile"><div class="tile-num" style="color:var(--red)">${DATA.alerts.length}</div><div class="tile-label">Alerts</div></div>
+    </div>
+    <div class="btn-block-row" style="margin-top:14px">
+      ${btn("Create Invoice", "go('createInvoice')", "primary")}
+      ${btn("View All Invoices", "go('allInvoices')", "secondary")}
+    </div>
+
+    <div class="section-title"><span class="st-left"><span class="st-ic">${ICON.fileText(14)}</span>Recent Invoices</span><span class="link" onclick="go('allInvoices')">View all</span></div>
+    <div class="card card-accent risk-low">
+      <div class="invoice-row">
+        <div>
+          <div class="name">Invoice SP-1003</div>
+          <div class="meta">Rachel Koh · Makeup Session</div>
+        </div>
+        <div style="text-align:right">
+          <div class="amt">${money(600)}</div>
+          <div class="meta">Paid · 10 Jul 2026</div>
+        </div>
+      </div>
+      <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
+        ${riskBadge("low","10")}
+        ${btn("View Details","go('invoicePaidDetails')","secondary","btn-sm")}
+      </div>
+    </div>
+    <div class="card card-accent risk-moderate">
+      <div class="invoice-row">
+        <div>
+          <div class="name">Invoice SP-1005</div>
+          <div class="meta">June Tan · Bridal Makeup</div>
+        </div>
+        <div style="text-align:right">
+          <div class="amt">${money(800)}</div>
+          <div class="meta">Due 18 Jul 2026</div>
+        </div>
+      </div>
+      <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
+        <span class="badge neutral"><span class="badge-dot"></span>Awaiting Payment</span>
+        ${btn("View Invoice","go('invoicePendingDetails')","secondary","btn-sm")}
+      </div>
+    </div>
+
+    <div class="section-title"><span class="st-left"><span class="st-ic">${ICON.bell(14)}</span>Payment Alerts</span><span class="link" onclick="go('allAlerts')">View all</span></div>
+    ${DATA.alerts.map(a=>alertCard(a)).join("")}
+  </div>
+`;
+
+/* ---------------- All invoices ---------------- */
+SCREENS.allInvoices = () => `
+  <div class="screen-pad">
+    ${card(`
+      <div class="invoice-row">
+        <div><div class="name">SP-1003</div><div class="meta">Rachel Koh · Makeup Session</div></div>
+        <div style="text-align:right"><div class="amt">${money(600)}</div><div class="meta">Paid</div></div>
+      </div>
+      <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
+        ${riskBadge("low","10")}
+        ${btn("View","go('invoicePaidDetails')","secondary","btn-sm")}
+      </div>
+    `, "card-accent risk-low")}
+    ${card(`
+      <div class="invoice-row">
+        <div><div class="name">SP-1004</div><div class="meta">Overdue by 2 days</div></div>
+        <div style="text-align:right"><div class="amt">${money(800)}</div><div class="meta">Due 18 Jul 2026</div></div>
+      </div>
+      <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
+        ${riskBadge("moderate","35")}
+        ${btn("View","go('overdueDetails')","secondary","btn-sm")}
+      </div>
+    `, "card-accent risk-moderate")}
+    ${card(`
+      <div class="invoice-row">
+        <div><div class="name">SP-1005</div><div class="meta">June Tan · Bridal Makeup</div></div>
+        <div style="text-align:right"><div class="amt">${money(800)}</div><div class="meta">Awaiting Payment</div></div>
+      </div>
+      <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
+        ${riskBadge("moderate","45")}
+        ${btn("View","go('invoicePendingDetails')","secondary","btn-sm")}
+      </div>
+    `, "card-accent risk-moderate")}
+    ${card(`
+      <div class="invoice-row">
+        <div><div class="name">SP-1006</div><div class="meta">Overpayment · under review</div></div>
+        <div style="text-align:right"><div class="amt">${money(1500)}</div><div class="meta">Invoiced ${money(800)}</div></div>
+      </div>
+      <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
+        ${riskBadge("moderate","50")}
+        ${btn("View","go('overpaymentDetails')","secondary","btn-sm")}
+      </div>
+    `, "card-accent risk-moderate")}
+  </div>
+`;
+
+/* ---------------- All alerts ---------------- */
+SCREENS.allAlerts = () => `
+  <div class="screen-pad">
+    ${DATA.alerts.map(a=>alertCard(a)).join("")}
+  </div>
+`;
+
+/* ---------------- Low-risk paid invoice details ---------------- */
+SCREENS.invoicePaidDetails = () => `
+  <div class="screen-pad">
+    <div class="decision-hero">
+      <div class="decision-icon risk-low" style="color:var(--green)">${ICON.checkCircle(30)}</div>
+      <h2>Payment Verified</h2>
+    </div>
+    ${card(`
+      ${kv("Invoice Reference","SP-1003")}
+      ${kv("Client","Rachel Koh")}
+      ${kv("Invoice Amount", money(600))}
+      ${kv("Amount Received", money(600))}
+      ${kv("Outstanding Amount", money(0))}
+      ${kv("Payment Date","10 July 2026")}
+      ${kv("Payment Origin","Singapore")}
+      ${kv("Status","Paid")}
+    `)}
+    <div style="margin-top:12px">${riskScoreBlock(10,"low")}</div>
+    <div class="section-title" style="margin-top:18px">Verification checks</div>
+    ${card(`
+      <div class="check-item" style="color:var(--green)">${ICON.check}<span style="color:var(--ink)">Payment amount matches invoice</span></div>
+      <div class="check-item" style="color:var(--green)">${ICON.check}<span style="color:var(--ink)">Invoice reference matches</span></div>
+      <div class="check-item" style="color:var(--green)">${ICON.check}<span style="color:var(--ink)">Payer name matches client</span></div>
+      <div class="check-item" style="color:var(--green)">${ICON.check}<span style="color:var(--ink)">Payment received before due date</span></div>
+    `)}
+    <div class="section-title">Risk check breakdown</div>
+    ${card(`
+      ${riskCheckRow("First-time payer", 10)}
+      <div style="display:flex;justify-content:space-between;padding-top:9px;font-weight:700;font-size:13px">
+        <span>Total</span><span class="mono" style="color:var(--green)">10/100 · Low Risk</span>
+      </div>
+    `)}
+    <div style="margin-top:12px">${notice("info", ICON.info(16), "Recommended outcome: payment successfully verified. No action is required.")}</div>
+    <div style="margin-top:16px">${btn("Back to Dashboard","toDashboard()","primary")}</div>
+  </div>
+`;
+
+/* ---------------- Pending invoice (SP-1005) details ---------------- */
+SCREENS.invoicePendingDetails = () => `
+  <div class="screen-pad">
+    ${card(`
+      ${kv("Invoice Reference","SP-1005")}
+      ${kv("Client","June Tan")}
+      ${kv("Service","Bridal Makeup")}
+      ${kv("Invoice Amount", money(800))}
+      ${kv("Amount Received", money(600))}
+      ${kv("Due Date","18 July 2026")}
+      ${kv("Client Contact","WhatsApp")}
+      ${kv("Status", `<span class="badge neutral"><span class="badge-dot"></span>Awaiting Payment</span>`)}
+    `)}
+    <div style="margin-top:12px">
+      ${notice("warn", ICON.alertTriangle(16), "A payment of S$600 was received against this invoice — S$200 short of the invoiced amount.")}
+    </div>
+    <div class="btn-block-row" style="margin-top:14px">
+      ${btn("View Payment Alert", "openModal('underpayment')", "secondary")}
+      ${btn("Share Invoice", "go('shareInvoice')", "primary")}
+    </div>
+  </div>
+`;
+
+/* ---------------- Underpayment details ---------------- */
+SCREENS.underpaymentDetails = () => `
+  <div class="screen-pad">
+    ${card(`
+      ${kv("Invoice Amount", money(800))}
+      ${kv("Amount Received", money(600))}
+      ${kv("Outstanding Amount", money(200))}
+    `)}
+    <div style="margin-top:12px">${riskScoreBlock(45,"moderate")}</div>
+    <div class="section-title" style="margin-top:18px">Risk check breakdown</div>
+    ${card(`
+      ${riskCheckRow("Payment below invoice amount", 30)}
+      ${riskCheckRow("Payment at least 20% below invoice amount", 10)}
+      ${riskCheckRow("First-time client", 5)}
+      ${riskCheckRow("Invoice reference matched", 0)}
+      <div style="display:flex;justify-content:space-between;padding-top:9px;font-weight:700;font-size:13px">
+        <span>Total</span><span class="mono" style="color:var(--orange)">45/100 · Moderate Risk</span>
+      </div>
+    `)}
+    <div style="margin-top:12px">${notice("warn", ICON.alertTriangle(16), "Recommended action: contact the client and request the remaining S$200.")}</div>
+    <div style="margin-top:16px">${btn("Contact Client","go('contactClient')","primary")}</div>
+  </div>
+`;
+
+/* ---------------- Overpayment details ---------------- */
+SCREENS.overpaymentDetails = () => `
+  <div class="screen-pad">
+    ${card(`
+      ${kv("Invoice Amount", money(800))}
+      ${kv("Amount Received", money(1500))}
+      ${kv("Excess Amount", money(700))}
+    `)}
+    <div style="margin-top:12px">${riskScoreBlock(50,"moderate")}</div>
+    <div class="section-title" style="margin-top:18px">Risk check breakdown</div>
+    ${card(`
+      ${riskCheckRow("Payment above invoice amount", 30)}
+      ${riskCheckRow("Payment more than 20% above invoice amount", 10)}
+      ${riskCheckRow("First-time payer", 10)}
+      ${riskCheckRow("Invoice reference matched", 0)}
+      <div style="display:flex;justify-content:space-between;padding-top:9px;font-weight:700;font-size:13px">
+        <span>Total</span><span class="mono" style="color:var(--orange)">50/100 · Moderate Risk</span>
+      </div>
+    `)}
+    <div style="margin-top:12px">${notice("warn", ICON.alertTriangle(16), "Contact the client to confirm why the payment is higher than the invoice amount. Do not refund the excess until it is verified.")}</div>
+    <div class="btn-block-row" style="margin-top:16px">
+      ${btn("Contact Client","go('contactClient')","secondary")}
+      ${btn("Contact Bank","go('contactBank')","primary")}
+    </div>
+  </div>
+`;
+
+/* ---------------- Overdue details ---------------- */
+SCREENS.overdueDetails = () => `
+  <div class="screen-pad">
+    ${card(`
+      ${kv("Invoice Reference","SP-1004")}
+      ${kv("Invoice Amount", money(800))}
+      ${kv("Amount Received", money(0))}
+      ${kv("Due Date","18 July 2026")}
+      ${kv("Status","Overdue")}
+    `)}
+    <div style="margin-top:12px">${riskScoreBlock(35,"moderate")}</div>
+    <div class="section-title" style="margin-top:18px">Risk check breakdown</div>
+    ${card(`
+      ${riskCheckRow("Invoice due date passed", 15)}
+      ${riskCheckRow("No full matching payment found", 15)}
+      ${riskCheckRow("Payment remains unpaid beyond grace period", 5)}
+      <div style="display:flex;justify-content:space-between;padding-top:9px;font-weight:700;font-size:13px">
+        <span>Total</span><span class="mono" style="color:var(--orange)">35/100 · Moderate Risk</span>
+      </div>
+    `)}
+    <div style="margin-top:12px">${notice("warn", ICON.clock(16), "Recommended action: send a reminder or contact the client.")}</div>
+    <div style="margin-top:16px">${btn("Contact Client","go('contactClient')","primary")}</div>
+  </div>
+`;
+
+/* ---------------- Suspicious payment details ---------------- */
+/* ---------------- Local unmatched payment details (base trigger — no overseas component) ---------------- */
+SCREENS.localMismatchDetails = () => `
+  <div class="screen-pad">
+    ${card(`
+      ${kv("Payer","Marcus Ong")}
+      ${kv("Payer Status","Not on your client list")}
+      ${kv("Amount", money(150))}
+      ${kv("Linked Invoice","None")}
+      ${kv("Origin","Singapore")}
+      ${kv("Home-base Country","Singapore")}
+    `)}
+    <div style="margin-top:12px">${riskScoreBlock(40,"moderate")}</div>
+    <div class="section-title" style="margin-top:18px">Risk check breakdown</div>
+    ${card(`
+      ${riskCheckRow("No matching invoice", 40)}
+      <div style="display:flex;justify-content:space-between;padding-top:9px;font-weight:700;font-size:13px">
+        <span>Total</span><span class="mono" style="color:var(--orange)">40/100 · Moderate Risk</span>
+      </div>
+    `)}
+    <div style="margin-top:12px">
+      ${notice("warn", ICON.alertTriangle(16), "A local, unmatched payment always triggers a review-level alert on its own. It only escalates to High Risk when combined with other factors, such as coming from outside Singapore.")}
+    </div>
+    <div style="margin-top:10px">
+      ${notice("info", ICON.info(16), "If this is a personal transfer (e.g. from a friend or family member), you can mark it as personal so it stops counting toward fraud risk.")}
+    </div>
+    <div class="btn-block-row" style="margin-top:16px">
+      ${btn("Mark as Personal","markLocalPersonal()","secondary")}
+      ${btn("Contact Bank","go('contactBank')","primary")}
+    </div>
+  </div>
+`;
+
+SCREENS.suspiciousDetails = () => `
+  <div class="screen-pad">
+    ${card(`
+      ${kv("Payer","Unknown")}
+      ${kv("Amount", money(4500))}
+      ${kv("Linked Invoice","None")}
+      ${kv("Origin","Malaysia")}
+      ${kv("Home-base Country","Singapore")}
+    `)}
+    <div style="margin-top:12px">${riskScoreBlock(75,"high")}</div>
+    <div class="section-title" style="margin-top:18px">Risk check breakdown</div>
+    ${card(`
+      ${riskCheckRow("No matching invoice", 40)}
+      ${riskCheckRow("First-time counterparty", 10)}
+      ${riskCheckRow("Payer identity could not be established", 10)}
+      ${riskCheckRow("Unmatched payment received outside Singapore", 15)}
+      <div style="display:flex;justify-content:space-between;padding-top:9px;font-weight:700;font-size:13px">
+        <span>Total</span><span class="mono" style="color:var(--red)">75/100 · High Risk</span>
+      </div>
+    `)}
+    <div style="margin-top:12px">${notice("danger", ICON.alertOctagon(16), "This unmatched payment escalated to High Risk because it also came from outside Singapore. Do not use or refund the funds until the payment is verified — contact the bank.")}</div>
+    <div style="margin-top:16px">${btn("Contact Bank","go('contactBank')","primary")}</div>
+  </div>
+`;
+
+/* ---------------- Contact client ---------------- */
+SCREENS.contactClient = () => `
+  <div class="screen-pad">
+    <div class="screen-lead">
+      <div class="screen-lead-ic">${ICON.send(18)}</div>
+      <div>
+        <h3>Send a reminder</h3>
+        <p>Reach out to your client about this invoice</p>
+      </div>
+    </div>
+    ${card(`
+      <div class="eyebrow" style="margin-bottom:8px">Send via</div>
+      <div class="btn-block-row" style="margin-bottom:14px">
+        <button class="btn btn-primary btn-sm" style="flex:1">WhatsApp</button>
+        <button class="btn btn-secondary btn-sm" style="flex:1">Email</button>
+      </div>
+      <div class="eyebrow" style="margin-bottom:8px">Message</div>
+      <div style="background:var(--navy-tint);border-radius:12px;padding:12px;font-size:13px;line-height:1.5;color:var(--ink)">
+        Hello, this is a reminder regarding Invoice SP-1005. An outstanding balance remains. Please review the invoice and complete the payment.
+      </div>
+    `)}
+    <div style="margin-top:16px">${btn("Send Reminder","sendReminder()","primary")}</div>
+  </div>
+`;
+
+/* ---------------- Contact bank ---------------- */
+SCREENS.contactBank = () => `
+  <div class="screen-pad">
+    <div class="screen-lead">
+      <div class="screen-lead-ic" style="background:var(--red-tint);color:var(--red)">${ICON.phoneCall(17)}</div>
+      <div>
+        <h3>Contact your bank</h3>
+        <p>Get this payment verified before acting on it</p>
+      </div>
+    </div>
+    ${notice("danger", ICON.alertOctagon(16), "You are being directed to your bank's official support channel. Do not transfer or refund the funds until the payment has been verified.")}
+    <div style="margin-top:12px">
+      ${card(`
+        ${kv("Bank", DATA.selectedBank)}
+        ${kv("Support line","1800-111-1111 (simulated)")}
+        ${kv("Reference","Read-only monitoring account")}
+      `)}
+    </div>
+    <div class="btn-block-row" style="margin-top:16px">
+      ${btn("Call Bank Support","callBank()","secondary")}
+      ${btn("Back to Dashboard","toDashboard()","primary")}
+    </div>
+  </div>
+`;
+
+/* =========================================================
+   Modal popups (risk alerts)
+   ========================================================= */
+function renderModal(){
+  const root = document.getElementById("modalroot");
+  if(!APP.modal){ root.innerHTML = ""; return; }
+  root.innerHTML = MODALS[APP.modal]();
+}
+
+const MODALS = {
+  underpayment: () => `
+    <div class="modal-overlay" onclick="if(event.target===this) dismissAlert()">
+      <div class="modal-sheet">
+        <div class="modal-grabber"></div>
+        <div class="modal-icon risk-moderate" style="color:var(--orange)">${ICON.alertTriangle(26)}</div>
+        <h3>Payment Amount Mismatch</h3>
+        <p>S$600 was received for Invoice SP-1005, but the invoiced amount is S$800.</p>
+        ${card(`${kv("Outstanding Amount", money(200))}`)}
+        <div style="margin:12px 0">${riskScoreBlock(45,"moderate")}</div>
+        <div class="btn-block-row">
+          ${btn("View Details","viewFromModal('underpaymentDetails')","primary")}
+          ${btn("Dismiss","dismissAlert()","secondary")}
+        </div>
+      </div>
+    </div>
+  `,
+  overpayment: () => `
+    <div class="modal-overlay" onclick="if(event.target===this) dismissAlert()">
+      <div class="modal-sheet">
+        <div class="modal-grabber"></div>
+        <div class="modal-icon risk-moderate" style="color:var(--orange)">${ICON.alertTriangle(26)}</div>
+        <h3>Overpayment Detected</h3>
+        <p>S$1,500 was received for Invoice SP-1006, but the invoiced amount is S$800.</p>
+        ${card(`${kv("Excess Amount", money(700))}`)}
+        <div style="margin:12px 0">${riskScoreBlock(50,"moderate")}</div>
+        ${notice("warn", ICON.info(16), "Do not refund the excess amount until the payment has been verified.")}
+        <div class="btn-block-row" style="margin-top:12px">
+          ${btn("View Details","viewFromModal('overpaymentDetails')","primary")}
+          ${btn("Dismiss","dismissAlert()","secondary")}
+        </div>
+      </div>
+    </div>
+  `,
+  overdue: () => `
+    <div class="modal-overlay" onclick="if(event.target===this) dismissAlert()">
+      <div class="modal-sheet">
+        <div class="modal-grabber"></div>
+        <div class="modal-icon risk-moderate" style="color:var(--orange)">${ICON.clock(26)}</div>
+        <h3>Payment Overdue</h3>
+        <p>No full matching payment was received 1 day after the due date for Invoice SP-1004.</p>
+        <div style="margin:12px 0">${riskScoreBlock(35,"moderate")}</div>
+        <div class="btn-block-row">
+          ${btn("View Details","viewFromModal('overdueDetails')","primary")}
+          ${btn("Dismiss","dismissAlert()","secondary")}
+        </div>
+      </div>
+    </div>
+  `,
+  localMismatch: () => `
+    <div class="modal-overlay" onclick="if(event.target===this) dismissAlert()">
+      <div class="modal-sheet">
+        <div class="modal-grabber"></div>
+        <div class="modal-icon risk-moderate" style="color:var(--orange)">${ICON.alertTriangle(26)}</div>
+        <h3>Unmatched Local Payment</h3>
+        <p>A payment of S$150 was received from Marcus Ong, who isn't on your client list.</p>
+        ${card(`${kv("Origin","Singapore")}${kv("Linked Invoice","None")}`)}
+        <div style="margin:12px 0">${riskScoreBlock(40,"moderate")}</div>
+        ${notice("info", ICON.info(16), "The sender's name is visible — this is flagged only because it doesn't match an invoice, not because the identity is unclear. Overseas unmatched payments are treated as higher risk since identity is harder to verify there.")}
+        <div class="btn-block-row" style="margin-top:12px">
+          ${btn("View Details","viewFromModal('localMismatchDetails')","primary")}
+          ${btn("Dismiss","dismissAlert()","secondary")}
+        </div>
+      </div>
+    </div>
+  `,
+  suspicious: () => `
+    <div class="modal-overlay" onclick="if(event.target===this) dismissAlert()">
+      <div class="modal-sheet">
+        <div class="modal-grabber"></div>
+        <div class="modal-icon risk-high" style="color:var(--red)">${ICON.alertOctagon(26)}</div>
+        <h3>Suspicious Payment Detected</h3>
+        <p>An unknown payer sent S$4,500. No matching invoice was found.</p>
+        ${card(`${kv("Origin","Malaysia")}${kv("Note","Unmatched payment received outside Singapore")}`)}
+        <div style="margin:12px 0">${riskScoreBlock(75,"high")}</div>
+        <div class="btn-block-row">
+          ${btn("View Details","viewFromModal('suspiciousDetails')","primary")}
+          ${btn("Contact Bank","viewFromModal('contactBank')","secondary")}
+        </div>
+      </div>
+    </div>
+  `
+};
+
+/* ---------------- Boot ---------------- */
+window.SCREENS = SCREENS;
+window.MODALS = MODALS;
+render();
+</script>
+</body>
+</html>
