@@ -1477,7 +1477,7 @@ SCREENS.allInvoices = () => `
         <div style="text-align:right"><div class="amt">${money(800)}</div><div class="meta">Awaiting Payment</div></div>
       </div>
       <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
-        ${riskBadge("moderate","45")}
+        ${riskBadge("moderate","50")}
         ${btn("View","go('invoicePendingDetails')","secondary","btn-sm")}
       </div>
     `, "card-accent risk-moderate")}
@@ -1569,15 +1569,15 @@ SCREENS.underpaymentDetails = () => `
       ${kv("Amount Received", money(600))}
       ${kv("Outstanding Amount", money(200))}
     `)}
-    <div style="margin-top:12px">${riskScoreBlock(45,"moderate")}</div>
+    <div style="margin-top:12px">${riskScoreBlock(50,"moderate")}</div>
     <div class="section-title" style="margin-top:18px">Risk check breakdown</div>
     ${card(`
       ${riskCheckRow("Payment below invoice amount", 30)}
       ${riskCheckRow("Payment at least 20% below invoice amount", 10)}
-      ${riskCheckRow("First-time client", 5)}
+      ${riskCheckRow("First-time client", 10)}
       ${riskCheckRow("Invoice reference matched", 0)}
       <div style="display:flex;justify-content:space-between;padding-top:9px;font-weight:700;font-size:13px">
-        <span>Total</span><span class="mono" style="color:var(--orange)">45/100 · Moderate Risk</span>
+        <span>Total</span><span class="mono" style="color:var(--orange)">50/100 · Moderate Risk</span>
       </div>
     `)}
     <div style="margin-top:12px">${notice("warn", ICON.alertTriangle(16), "Recommended action: contact the client and request the remaining S$200.")}</div>
@@ -1763,7 +1763,7 @@ const MODALS = {
         <h3>Payment Amount Mismatch</h3>
         <p>S$600 was received for Invoice SP-1005, but the invoiced amount is S$800.</p>
         ${card(`${kv("Outstanding Amount", money(200))}`)}
-        <div style="margin:12px 0">${riskScoreBlock(45,"moderate")}</div>
+        <div style="margin:12px 0">${riskScoreBlock(50,"moderate")}</div>
         <div class="btn-block-row">
           ${btn("View Details","viewFromModal('underpaymentDetails')","primary")}
           ${btn("Dismiss","dismissAlert()","secondary")}
@@ -1845,3 +1845,4 @@ render();
 </script>
 </body>
 </html>
+
