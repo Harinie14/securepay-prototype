@@ -299,7 +299,9 @@ select.input{ appearance:none; -webkit-appearance:none; background-image:url("da
   border:1px solid var(--line);
   border-radius:var(--radius-md);
   padding:14px;
+  box-shadow:0 2px 8px rgba(14,28,54,.04);
 }
+.tile .tile-ic{ width:26px; height:26px; border-radius:8px; display:flex; align-items:center; justify-content:center; margin-bottom:8px; }
 .tile .tile-num{ font-family:var(--font-mono); font-size:24px; font-weight:600; color:var(--navy); }
 .tile .tile-label{ font-size:12px; color:var(--muted); margin-top:2px; }
 
@@ -469,6 +471,7 @@ select.input{ appearance:none; -webkit-appearance:none; background-image:url("da
   width:44px; height:44px; border-radius:13px; flex:none;
   display:flex; align-items:center; justify-content:center;
   background:var(--navy-tint); color:var(--navy-3);
+  box-shadow:0 3px 8px rgba(14,28,54,.06);
 }
 .screen-lead h3{ font-family:var(--font-display); font-size:15.5px; font-weight:600; color:var(--navy); margin:0; }
 .screen-lead p{ font-size:12.5px; color:var(--muted); margin:2px 0 0; }
@@ -529,10 +532,10 @@ select.input{ appearance:none; -webkit-appearance:none; background-image:url("da
 
 /* ---------- Success / decision block ---------- */
 .decision-hero{ text-align:center; padding:22px 10px 6px; }
-.decision-icon{ width:64px; height:64px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 14px; }
-.decision-icon.risk-low{ background:var(--green-tint); }
-.decision-icon.risk-moderate{ background:var(--orange-tint); }
-.decision-icon.risk-high{ background:var(--red-tint); }
+.decision-icon{ width:64px; height:64px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 14px; box-shadow:0 0 0 8px rgba(14,28,54,.03); }
+.decision-icon.risk-low{ background:var(--green-tint); box-shadow:0 0 0 8px rgba(29,158,109,.06); }
+.decision-icon.risk-moderate{ background:var(--orange-tint); box-shadow:0 0 0 8px rgba(219,138,46,.07); }
+.decision-icon.risk-high{ background:var(--red-tint); box-shadow:0 0 0 8px rgba(214,72,63,.07); }
 .decision-icon.neutral{ background:var(--navy-tint); }
 .decision-hero h2{ font-family:var(--font-display); font-size:19px; font-weight:600; color:var(--navy); margin:0 0 4px; }
 .decision-hero p{ font-size:13px; color:var(--muted); margin:0; }
@@ -699,6 +702,34 @@ select.input{ appearance:none; -webkit-appearance:none; background-image:url("da
 .keypad-key.empty{ visibility:hidden; }
 .keypad-key.backspace{ display:flex; align-items:center; justify-content:center; color:var(--navy-3); }
 
+/* ---------- Face liveness check (Singpass face verification screen) ---------- */
+.face-scan-wrap{
+  position:relative;
+  width:132px; height:132px;
+  margin:6px auto 22px;
+  display:flex; align-items:center; justify-content:center;
+}
+.face-spinner{
+  position:absolute;
+  width:112px; height:112px;
+  border-radius:50%;
+  border:3px solid var(--line);
+  border-top-color:var(--navy-3);
+}
+@media (prefers-reduced-motion: no-preference){
+  .face-spinner{ animation:spin .9s linear infinite; }
+}
+@keyframes spin{ to{ transform:rotate(360deg); } }
+.face-icon-wrap{
+  position:relative; z-index:2;
+  width:82px; height:82px;
+  border-radius:50%;
+  background:var(--navy-tint);
+  color:var(--navy-3);
+  display:flex; align-items:center; justify-content:center;
+  transition:background .3s ease, color .3s ease;
+}
+
 /* ---------- Responsive: real mobile becomes full app ---------- */
 @media (max-width: 480px){
   body{ align-items:stretch; }
@@ -864,7 +895,8 @@ const ICON = {
   fingerprint:(size=32)=>`<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10a3 3 0 0 1 3 3c0 2.5-.8 4-1.3 5.3"/><path d="M8.7 19c-.7-1.6-1.2-3-1.2-6a4.5 4.5 0 0 1 4.5-4.5"/><path d="M12 5.5a7.5 7.5 0 0 1 7.5 7.5c0 1.5-.2 2.7-.5 3.8"/><path d="M4.5 16a12 12 0 0 1-.8-4.5A8.3 8.3 0 0 1 12 3.2c1 0 1.9.15 2.8.44"/><path d="M17.8 20c.3-.6.5-1.1.7-1.7"/><path d="M2.5 12.8A9.5 9.5 0 0 1 12 1.8c1.2 0 2.4.2 3.5.6"/></svg>`,
   camera:(size=16)=>`<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>`,
   sparkle:(size=16)=>`<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.2 6.8L21 11l-6.8 2.2L12 20l-2.2-6.8L3 11l6.8-2.2z"/></svg>`,
-  backspace:(size=18)=>`<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><path d="M13 9l6 6M19 9l-6 6"/></svg>`
+  backspace:(size=18)=>`<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><path d="M13 9l6 6M19 9l-6 6"/></svg>`,
+  face:(size=40)=>`<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="9" cy="10" r="0.9" fill="currentColor" stroke="none"/><circle cx="15" cy="10" r="0.9" fill="currentColor" stroke="none"/><path d="M8.5 15c1 1 2 1.5 3.5 1.5s2.5-.5 3.5-1.5"/></svg>`
 };
 
 /* ---------------- UI component builders ---------------- */
@@ -899,17 +931,14 @@ function sectionTitle(iconHtml, label, linkHtml=""){
 const NO_CHROME = ["landing","dashboard"]; // screens that render their own full header
 
 const META = {
-  manualLogin:{title:"Log In"},
-  otp:{title:"Verify Your Login"},
-  forgotPassword:{title:"Reset Password"},
   singpassReturning:{title:"Log In with Singpass"},
   singpassPasscode:{title:"Singpass Passcode"},
+  singpassFaceScan:{title:"Face Verification"},
   singpassVerifiedReturning:{title:"Login Verified"},
   createAccount:{title:"Create Account"},
   myInfoConsent:{title:"MyInfo Consent"},
   singpassNew:{title:"Verify Your Identity"},
   identityVerified:{title:"Identity Verified"},
-  identityRejected:{title:"Verification Failed"},
   connectBank:{title:"Connect Bank"},
   bankConnected:{title:"Bank Connected"},
   paymentAlerts:{title:"Payment Alerts"},
@@ -925,7 +954,8 @@ const META = {
   suspiciousDetails:{title:"Suspicious Payment"},
   contactClient:{title:"Contact Client"},
   contactBank:{title:"Contact Bank"},
-  shareInvoice:{title:"Share Invoice"}
+  shareInvoice:{title:"Share Invoice"},
+  shareInvoiceSuccess:{title:"Invoice Sent"}
 };
 
 function renderHeader(){
@@ -944,11 +974,13 @@ function renderHeader(){
 }
 
 /* ---------------- Render engine ---------------- */
+const SCREEN_MOUNT = {}; // optional per-screen "after render" hooks (e.g. timed animations)
 function render(){
   renderHeader();
   const content = document.getElementById("appcontent");
   const fn = SCREENS[APP.current] || SCREENS.landing;
   content.innerHTML = fn();
+  if (typeof SCREEN_MOUNT[APP.current] === "function") SCREEN_MOUNT[APP.current]();
 }
 
 /* Expose state on window — handy for debugging in devtools (window.APP, window.DATA) */
@@ -1003,15 +1035,19 @@ function goSingpassPasscode(nextScreen){
   SINGPASS_NEXT = nextScreen;
   go('singpassPasscode');
 }
+/* A face liveness check (look left / look right) happens before the passcode, in both flows. */
+function goSingpassFaceScan(nextScreen){
+  SINGPASS_NEXT = nextScreen;
+  go('singpassFaceScan');
+}
 function forgotSingpassPasscode(){
   toast(`${ICON.info(14)} Redirecting to Singpass app reset (simulated)`);
 }
 
-function resendOtp(){
-  toast(`${ICON.check} Code resent to ${DATA.user.email}`);
-}
+let SHARE_CHANNEL = "WhatsApp";
 function shareInvoiceAction(channel){
-  toast(`${ICON.check} Invoice shared via ${channel} (simulated)`);
+  SHARE_CHANNEL = channel;
+  go('shareInvoiceSuccess');
 }
 function dismissAlert(){
   closeModal();
@@ -1090,64 +1126,10 @@ SCREENS.landing = () => `
     </div>
     <div class="landing-actions">
       ${btn("Create Account", "go('createAccount')", "primary")}
-      ${btn("Log In", "go('manualLogin')", "secondary")}
       <button class="btn btn-singpass" onclick="go('singpassReturning')" style="gap:9px">${ICON.fingerprint(17)} Log In with Singpass</button>
     </div>
   </div>
 `;
-
-/* ---------------- 2. Manual login ---------------- */
-SCREENS.manualLogin = () => `
-  <div class="screen-pad">
-    <p class="muted small" style="margin-top:4px">Log in to your SecurePay account.</p>
-    <div class="field">
-      <label>Email</label>
-      <input class="input" type="text" value="${DATA.user.email}" readonly>
-    </div>
-    <div class="field">
-      <label>Password</label>
-      <input class="input" type="password" value="${DATA.user.password}" readonly>
-    </div>
-    ${btn("Log In", "go('otp')", "primary")}
-    <div style="text-align:center;margin-top:6px">
-      <span class="btn-ghost" style="display:inline;cursor:pointer;font-size:13px" onclick="go('forgotPassword')">Forgot Password?</span>
-    </div>
-  </div>
-`;
-
-/* ---------------- 3. In-app OTP ---------------- */
-SCREENS.otp = () => `
-  <div class="screen-pad">
-    <p class="muted small">A verification code was sent to <strong style="color:var(--ink)">${DATA.user.email}</strong></p>
-    <div class="otp-row">
-      ${["1","4","2","0","0","7"].map(d=>`<div class="otp-box">${d}</div>`).join("")}
-    </div>
-    <div style="text-align:center;margin-bottom:20px">
-      <span class="small muted" style="cursor:pointer;text-decoration:underline" onclick="resendOtp()">Resend code</span>
-    </div>
-    ${btn("Verify and Continue", "go('dashboard')", "primary")}
-  </div>
-`;
-
-/* ---------------- Forgot password ---------------- */
-SCREENS.forgotPassword = () => `
-  <div class="screen-pad" id="fpwrap">
-    <p class="muted small">Enter your account email and we'll send reset instructions.</p>
-    <div class="field">
-      <label>Email</label>
-      <input class="input" type="text" value="${DATA.user.email}" readonly>
-    </div>
-    <div id="fp-action">
-      ${btn("Send Reset Link", "handleForgotPassword()", "primary")}
-    </div>
-  </div>
-`;
-function handleForgotPassword(){
-  document.getElementById("fp-action").innerHTML = `
-    ${notice("info", ICON.info(16), "If an account exists for this email, password reset instructions have been sent. For your security, we don't confirm which emails are registered.")}
-    <div style="margin-top:14px">${btn("Back to Log In", "go('manualLogin')", "secondary")}</div>
-  `;
-}
 
 /* ---------------- Shared Singpass mock panel (generic icon + brand colour, not the real logo) ---------------- */
 function spVerifyPanel(subtitle){
@@ -1173,12 +1155,83 @@ SCREENS.singpassReturning = () => `
   <div class="screen-pad">
     ${spVerifyPanel("National Digital Identity · Verification requested by SecurePay")}
     <div style="margin-top:16px">
-      ${btn("Verify with Singpass", "goSingpassPasscode('singpassVerifiedReturning')", "primary")}
+      ${btn("Verify with Singpass", "goSingpassFaceScan('singpassVerifiedReturning')", "primary")}
     </div>
   </div>
 `;
 
 /* ---------------- Singpass App Passcode (shared by both Singpass entry points) ---------------- */
+/* ---------------- Face liveness check (look left / look right anti-spoofing step) ---------------- */
+/* ---------------- Face liveness check — simple scan spinner, falls back to passcode if it can't verify ---------------- */
+SCREENS.singpassFaceScan = () => `
+  <div class="screen-pad" style="text-align:center">
+    <p class="muted small" id="faceStatusText">Scanning your face…</p>
+    <div class="face-scan-wrap">
+      <div class="face-spinner" id="faceSpinner"></div>
+      <div class="face-icon-wrap" id="faceIconWrap">${ICON.face(38)}</div>
+    </div>
+    <div id="faceResultWrap" style="display:none"></div>
+    <div style="margin-top:10px">
+      <span class="small muted" style="cursor:pointer;text-decoration:underline" onclick="forceFaceScanFail()">Trouble scanning? Use passcode instead</span>
+    </div>
+  </div>
+`;
+
+/* Renders whichever outcome the face scan reaches — success (leads to dashboard/identity
+   verified) or failure (falls back to Singpass passcode entry). */
+function renderFaceScanOutcome(myMount, outcome){
+  if (faceScanMountId !== myMount) return; // user navigated away or a newer scan started
+  const iconWrap = document.getElementById("faceIconWrap");
+  if (!iconWrap) return;
+  document.getElementById("faceSpinner").style.display = "none";
+  const statusText = document.getElementById("faceStatusText");
+  const resultWrap = document.getElementById("faceResultWrap");
+
+  if (outcome === "success") {
+    iconWrap.style.background = "var(--green-tint)";
+    iconWrap.style.color = "var(--green)";
+    statusText.textContent = "Face verified";
+    resultWrap.innerHTML = `
+      ${notice("info", ICON.check, "Your identity has been confirmed via facial recognition.")}
+      <div style="margin-top:14px">${btn("Continue", "go(SINGPASS_NEXT)", "primary")}</div>
+    `;
+  } else {
+    iconWrap.style.background = "var(--red-tint)";
+    iconWrap.style.color = "var(--red)";
+    statusText.textContent = "Face recognition unsuccessful";
+    resultWrap.innerHTML = `
+      ${notice("danger", ICON.alertOctagon(16), "We couldn't verify your face. You can log in with your Singpass passcode instead.")}
+      <div style="margin-top:14px">${btn("Enter Passcode", "go('singpassPasscode')", "primary")}</div>
+    `;
+  }
+
+  resultWrap.style.display = "";
+  resultWrap.style.opacity = "0";
+  const reveal = () => {
+    resultWrap.style.transition = "opacity .3s ease";
+    resultWrap.style.opacity = "1";
+  };
+  if (typeof requestAnimationFrame === "function") requestAnimationFrame(reveal);
+  else reveal();
+}
+
+/* Lets the demo link jump straight to the failure outcome, cancelling the pending
+   automatic success by invalidating the current mount id. */
+function forceFaceScanFail(){
+  faceScanMountId++;
+  renderFaceScanOutcome(faceScanMountId, "fail");
+}
+
+/* Runs once each time the face scan screen mounts. By default, resolves to success
+   after a short delay (biometric-only login, no passcode needed) unless the demo
+   link above has already forced a failure first. */
+let faceScanMountId = 0;
+SCREEN_MOUNT.singpassFaceScan = function(){
+  faceScanMountId++;
+  const myMount = faceScanMountId;
+  setTimeout(() => { renderFaceScanOutcome(myMount, "success"); }, 1800);
+};
+
 SCREENS.singpassPasscode = () => `
   <div class="screen-pad" style="text-align:center">
     <h3 class="disp" style="font-size:17px;text-align:left;margin:2px 0 14px">Enter your Singpass app passcode to proceed</h3>
@@ -1223,6 +1276,13 @@ SCREENS.singpassVerifiedReturning = () => `
 /* ---------------- Create account ---------------- */
 SCREENS.createAccount = () => `
   <div class="screen-pad">
+    <div class="screen-lead">
+      <div class="screen-lead-ic">${ICON.face(20)}</div>
+      <div>
+        <h3>Create your account</h3>
+        <p>Just the basics to get you started</p>
+      </div>
+    </div>
     <div class="field"><label>Full Name</label><input class="input" value="${DATA.user.name}" readonly></div>
     <div class="field"><label>Email</label><input class="input" value="${DATA.user.email}" readonly></div>
     <div class="field"><label>Phone Number</label><input class="input" value="+65 ${DATA.user.phone}" readonly></div>
@@ -1239,7 +1299,13 @@ SCREENS.createAccount = () => `
 /* ---------------- MyInfo consent ---------------- */
 SCREENS.myInfoConsent = () => `
   <div class="screen-pad">
-    <p class="muted small">SecurePay is requesting the following details from MyInfo:</p>
+    <div class="screen-lead">
+      <div class="screen-lead-ic">${ICON.shield(20)}</div>
+      <div>
+        <h3>Your data, protected</h3>
+        <p>SecurePay is requesting these details from MyInfo</p>
+      </div>
+    </div>
     ${card(`
       <div class="check-item"><span style="color:var(--navy-3)">${ICON.check}</span> Full Name</div>
       <div class="check-item"><span style="color:var(--navy-3)">${ICON.check}</span> Masked NRIC</div>
@@ -1260,10 +1326,7 @@ SCREENS.singpassNew = () => `
   <div class="screen-pad">
     ${spVerifyPanel("National Digital Identity · Identity verification for onboarding")}
     <div style="margin-top:16px">
-      ${btn("Verify with Singpass", "goSingpassPasscode('identityVerified')", "primary")}
-    </div>
-    <div style="text-align:center;margin-top:10px">
-      <span class="small muted" style="cursor:pointer;text-decoration:underline" onclick="go('identityRejected')">Demo: simulate a rejected verification</span>
+      ${btn("Verify with Singpass", "goSingpassFaceScan('identityVerified')", "primary")}
     </div>
   </div>
 `;
@@ -1283,30 +1346,6 @@ SCREENS.identityVerified = () => `
       ${kv("Decision", `<span class="badge risk-low"><span class="badge-dot"></span>Approved</span>`)}
     `)}
     <div style="margin-top:16px">${btn("Continue", "go('connectBank')", "primary")}</div>
-  </div>
-`;
-
-/* ---------------- Identity rejected (onboarding-level reject — SecurePay's own KYC, not the bank's) ---------------- */
-SCREENS.identityRejected = () => `
-  <div class="screen-pad">
-    <div class="decision-hero">
-      <div class="decision-icon risk-high" style="color:var(--red)">${ICON.xCircle(30)}</div>
-      <h2>Verification Failed</h2>
-    </div>
-    ${card(`
-      ${kv("Name", DATA.user.name)}
-      ${kv("Masked NRIC", DATA.user.nric)}
-      ${kv("Verification Result","Failed")}
-      ${kv("Reason","NRIC already linked to an existing SecurePay account")}
-      ${kv("Decision", `<span class="badge risk-high"><span class="badge-dot"></span>Rejected</span>`)}
-    `)}
-    <div style="margin-top:12px">
-      ${notice("danger", ICON.alertOctagon(16), "For your security, SecurePay only allows one account per verified identity. This check runs on SecurePay's own user records — it's separate from your bank's account verification.")}
-    </div>
-    <div class="btn-block-row" style="margin-top:16px">
-      ${btn("Try Again","go('myInfoConsent')","secondary")}
-      ${btn("Log In Instead","go('manualLogin')","primary")}
-    </div>
   </div>
 `;
 
@@ -1447,6 +1486,33 @@ SCREENS.shareInvoice = () => `
     </div>
   </div>
 `;
+
+const SHARE_CHANNEL_MESSAGES = {
+  "WhatsApp": "Successfully sent invoice to client via WhatsApp.",
+  "Email": "Successfully sent invoice to client via Email.",
+  "Link copy": "Invoice link copied — ready to share with your client."
+};
+
+SCREENS.shareInvoiceSuccess = () => {
+  const inv = DATA.invoices[SHARE_INVOICE_REF] || {};
+  return `
+    <div class="screen-pad">
+      <div class="decision-hero">
+        <div class="decision-icon risk-low" style="color:var(--green)">${ICON.checkCircle(30)}</div>
+        <h2>Invoice Sent</h2>
+        <p>${SHARE_CHANNEL_MESSAGES[SHARE_CHANNEL] || "Successfully sent invoice to client."}</p>
+      </div>
+      ${card(`
+        ${kv("Invoice Reference", SHARE_INVOICE_REF)}
+        ${kv("Client", inv.client || "—")}
+        ${kv("Service", inv.service || "—")}
+        ${kv("Amount", money(inv.amount || 0))}
+        ${kv("Due Date", inv.due || "—")}
+      `)}
+      <div style="margin-top:16px">${btn("Return to Dashboard", "toDashboard()", "primary")}</div>
+    </div>
+  `;
+};
 /* =========================================================
    Screen templates — Part 2: Dashboard, invoices, alerts
    ========================================================= */
@@ -1495,10 +1561,10 @@ SCREENS.dashboard = () => `
   </div>
   <div class="screen-pad">
     <div class="tile-grid">
-      <div class="tile"><div class="tile-num" style="color:var(--navy-3)">1</div><div class="tile-label">Awaiting Payment</div></div>
-      <div class="tile"><div class="tile-num" style="color:var(--green)">1</div><div class="tile-label">Paid</div></div>
-      <div class="tile"><div class="tile-num" style="color:var(--orange)">1</div><div class="tile-label">Overdue</div></div>
-      <div class="tile"><div class="tile-num" style="color:var(--red)">${DATA.alerts.length}</div><div class="tile-label">Alerts</div></div>
+      <div class="tile"><div class="tile-ic" style="background:var(--navy-tint);color:var(--navy-3)">${ICON.clock(15)}</div><div class="tile-num" style="color:var(--navy-3)">1</div><div class="tile-label">Awaiting Payment</div></div>
+      <div class="tile"><div class="tile-ic" style="background:var(--green-tint);color:var(--green)">${ICON.check}</div><div class="tile-num" style="color:var(--green)">1</div><div class="tile-label">Paid</div></div>
+      <div class="tile"><div class="tile-ic" style="background:var(--orange-tint);color:var(--orange)">${ICON.alertTriangle(15)}</div><div class="tile-num" style="color:var(--orange)">1</div><div class="tile-label">Overdue</div></div>
+      <div class="tile"><div class="tile-ic" style="background:var(--red-tint);color:var(--red)">${ICON.bell(14)}</div><div class="tile-num" style="color:var(--red)">${DATA.alerts.length}</div><div class="tile-label">Alerts</div></div>
     </div>
     <div class="btn-block-row" style="margin-top:14px">
       ${btn("Create Invoice", "go('createInvoice')", "primary")}
@@ -1510,7 +1576,7 @@ SCREENS.dashboard = () => `
       <div class="invoice-row">
         <div>
           <div class="name">Invoice SP-1003</div>
-          <div class="meta">Rachel Koh · Makeup Session</div>
+          <div class="meta">Rachel Koh · ${ICON.sparkle(11)} Makeup Session</div>
         </div>
         <div style="text-align:right">
           <div class="amt">${money(600)}</div>
@@ -1526,7 +1592,7 @@ SCREENS.dashboard = () => `
       <div class="invoice-row">
         <div>
           <div class="name">Invoice SP-1005</div>
-          <div class="meta">June Tan · Bridal Makeup</div>
+          <div class="meta">June Tan · ${ICON.sparkle(11)} Bridal Makeup</div>
         </div>
         <div style="text-align:right">
           <div class="amt">${money(800)}</div>
@@ -1547,9 +1613,16 @@ SCREENS.dashboard = () => `
 /* ---------------- All invoices ---------------- */
 SCREENS.allInvoices = () => `
   <div class="screen-pad">
+    <div class="screen-lead">
+      <div class="screen-lead-ic">${ICON.fileText(18)}</div>
+      <div>
+        <h3>All Invoices</h3>
+        <p>Every invoice, tracked in one place</p>
+      </div>
+    </div>
     ${card(`
       <div class="invoice-row">
-        <div><div class="name">SP-1003</div><div class="meta">Rachel Koh · Makeup Session</div></div>
+        <div><div class="name">SP-1003</div><div class="meta">Rachel Koh · ${ICON.sparkle(11)} Makeup Session</div></div>
         <div style="text-align:right"><div class="amt">${money(600)}</div><div class="meta">Paid</div></div>
       </div>
       <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
@@ -1569,7 +1642,7 @@ SCREENS.allInvoices = () => `
     `, "card-accent risk-moderate")}
     ${card(`
       <div class="invoice-row">
-        <div><div class="name">SP-1005</div><div class="meta">June Tan · Bridal Makeup</div></div>
+        <div><div class="name">SP-1005</div><div class="meta">June Tan · ${ICON.sparkle(11)} Bridal Makeup</div></div>
         <div style="text-align:right"><div class="amt">${money(800)}</div><div class="meta">Awaiting Payment</div></div>
       </div>
       <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
@@ -1593,6 +1666,13 @@ SCREENS.allInvoices = () => `
 /* ---------------- All alerts ---------------- */
 SCREENS.allAlerts = () => `
   <div class="screen-pad">
+    <div class="screen-lead">
+      <div class="screen-lead-ic" style="background:var(--red-tint);color:var(--red)">${ICON.bell(18)}</div>
+      <div>
+        <h3>Payment Alerts</h3>
+        <p>Everything flagged for your review</p>
+      </div>
+    </div>
     ${DATA.alerts.map(a=>alertCard(a)).join("")}
   </div>
 `;
@@ -1780,12 +1860,15 @@ SCREENS.localMismatchDetails = () => `
 SCREENS.suspiciousDetails = () => `
   <div class="screen-pad">
     ${card(`
-      ${kv("Payer","Unknown")}
+      ${kv("Payer","PayBridge Remittance Co.")}
       ${kv("Amount", money(4500))}
       ${kv("Linked Invoice","None")}
       ${kv("Origin","Malaysia")}
       ${kv("Home-base Country","Singapore")}
     `)}
+    <div style="margin-top:10px">
+      ${notice("info", ICON.info(16), "The name shown often belongs to an intermediary or remittance company, not the original sender — cross-border transfers don't always preserve the actual client's identity.")}
+    </div>
     <div style="margin-top:12px">${riskScoreBlock(75,"high")}</div>
     <div class="section-title" style="margin-top:18px">Risk check breakdown</div>
     ${card(`
@@ -1933,7 +2016,7 @@ const MODALS = {
         <div class="modal-grabber"></div>
         <div class="modal-icon risk-high" style="color:var(--red)">${ICON.alertOctagon(26)}</div>
         <h3>Suspicious Payment Detected</h3>
-        <p>An unknown payer sent S$4,500. No matching invoice was found.</p>
+        <p>PayBridge Remittance Co. sent S\$4,500 on behalf of an unidentified client. No matching invoice was found.</p>
         ${card(`${kv("Origin","Malaysia")}${kv("Note","Unmatched payment received outside Singapore")}`)}
         <div style="margin:12px 0">${riskScoreBlock(75,"high")}</div>
         <div class="btn-block-row">
