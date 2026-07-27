@@ -461,6 +461,43 @@ select.input{ appearance:none; -webkit-appearance:none; background-image:url("da
 .avatar-ring{ width:40px; height:40px; border-radius:50%; background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.25); display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:600; font-size:15px; }
 
 .section-title{ font-family:var(--font-display); font-size:15px; font-weight:600; color:var(--navy); margin:22px 0 10px; display:flex; align-items:center; gap:8px; justify-content:space-between; }
+
+/* ---------- Dashboard tab switch (Alerts / Recent Invoices) ---------- */
+.tab-switch{
+  display:flex;
+  background:var(--navy-tint);
+  border-radius:12px;
+  padding:4px;
+  gap:4px;
+}
+.tab-btn{
+  flex:1;
+  display:flex; align-items:center; justify-content:center; gap:6px;
+  padding:9px 6px;
+  border-radius:9px;
+  font-size:12.5px;
+  font-weight:600;
+  color:var(--muted);
+  cursor:pointer;
+  transition:background .15s ease, color .15s ease;
+}
+.tab-btn.active{
+  background:var(--white);
+  color:var(--navy);
+  box-shadow:0 2px 6px rgba(14,28,54,.1);
+}
+.tab-btn .tab-count{
+  background:var(--red);
+  color:var(--white);
+  font-family:var(--font-mono);
+  font-size:10px;
+  font-weight:700;
+  min-width:16px;
+  height:16px;
+  border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+  padding:0 3px;
+}
 .section-title .st-left{ display:flex; align-items:center; gap:8px; }
 .section-title .st-ic{ width:26px; height:26px; border-radius:8px; background:var(--navy-tint); color:var(--navy-3); display:flex; align-items:center; justify-content:center; flex:none; }
 .section-title .link{ font-family:var(--font-body); font-size:12.5px; font-weight:600; color:var(--navy-3); cursor:pointer; }
@@ -799,15 +836,17 @@ const DATA = {
   invoices:{
     "SP-1003":{client:"Rachel Koh", service:"Makeup Session", amount:600, received:600, due:"—", paidDate:"10 July 2026", status:"Paid", risk:10, level:"low", origin:"Singapore"},
     "SP-1004":{client:"—", service:"—", amount:800, received:0, due:"18 July 2026", status:"Overdue", risk:35, level:"moderate"},
-    "SP-1005":{client:"June Tan", service:"Bridal Makeup", amount:800, received:600, due:"18 July 2026", status:"Awaiting Payment", risk:45, level:"moderate", ref:"SP-1005", contact:"WhatsApp"},
-    "SP-1006":{client:"Unknown client", service:"—", amount:800, received:1500, due:"—", status:"Under Review", risk:50, level:"moderate"}
+    "SP-1005":{client:"June Tan", service:"Bridal Makeup", amount:800, received:600, due:"18 July 2026", status:"Awaiting Payment", risk:40, level:"moderate", ref:"SP-1005", contact:"WhatsApp"},
+    "SP-1006":{client:"Unknown client", service:"—", amount:800, received:1500, due:"—", status:"Under Review", risk:40, level:"moderate"},
+    "SP-1007":{client:"Amanda Ng", service:"Engagement Shoot Makeup", amount:450, received:450, due:"—", paidDate:"5 July 2026", status:"Paid", risk:10, level:"low", origin:"Singapore"},
+    "SP-1008":{client:"Priya Nair", service:"Photoshoot Makeup", amount:350, received:350, due:"—", paidDate:"1 July 2026", status:"Paid", risk:10, level:"low", origin:"Singapore"}
   },
   alerts:[
-    {id:"a1", type:"underpay", title:"Underpayment Detected", msg:"Payment for Invoice SP-1005 is S$200 below the invoiced amount.", level:"moderate"},
-    {id:"a2", type:"overpay", title:"Overpayment Detected", msg:"Payment for Invoice SP-1006 is S$700 above the invoiced amount.", level:"moderate"},
-    {id:"a3", type:"overdue", title:"Payment Overdue", msg:"Invoice SP-1004 is overdue by two days.", level:"moderate"},
-    {id:"a4", type:"local_mismatch", title:"Unmatched Local Payment", msg:"A local payment of S$150 doesn't match any invoice on file.", level:"moderate"},
-    {id:"a5", type:"suspicious", title:"Suspicious Payment Detected", msg:"An overseas payment of S$4,500 has no matching invoice.", level:"high"}
+    {id:"a1", type:"underpay", title:"Underpayment Detected", msg:"Payment for Invoice SP-1005 is S$200 below the invoiced amount.", level:"moderate", score:40},
+    {id:"a2", type:"overpay", title:"Overpayment Detected", msg:"Payment for Invoice SP-1006 is S$700 above the invoiced amount.", level:"moderate", score:40},
+    {id:"a3", type:"overdue", title:"Payment Overdue", msg:"Invoice SP-1004 is overdue by two days.", level:"moderate", score:35},
+    {id:"a4", type:"local_mismatch", title:"Unmatched Local Payment", msg:"A local payment of S$150 doesn't match any invoice on file.", level:"moderate", score:50},
+    {id:"a5", type:"suspicious", title:"Suspicious Payment Detected", msg:"An overseas payment of S$4,500 has no matching invoice.", level:"high", score:75}
   ]
 };
 
@@ -947,6 +986,7 @@ const META = {
   allInvoices:{title:"All Invoices"},
   allAlerts:{title:"Payment Alerts"},
   invoicePaidDetails:{title:"Payment Verified"},
+  paidInvoiceDetails:{title:"Payment Verified"},
   invoicePendingDetails:{title:"Invoice Details"},
   underpaymentDetails:{title:"Underpayment Details"},
   overpaymentDetails:{title:"Overpayment Details"},
@@ -1016,6 +1056,23 @@ function goShareInvoice(invoiceRef){
   go('shareInvoice');
 }
 
+/* Generic paid-invoice screen for straightforward, low-risk example invoices
+   (e.g. SP-1007, SP-1008) — reads whichever invoice is being viewed from
+   DATA.invoices instead of hardcoding one, like SP-1003's dedicated screen does. */
+window.PAID_INVOICE_REF = "SP-1007";
+function goPaidInvoiceDetails(invoiceRef){
+  PAID_INVOICE_REF = invoiceRef;
+  go('paidInvoiceDetails');
+}
+
+/* Which tab is showing on the dashboard — defaults to Alerts, since that's the
+   view that most often needs the freelancer's immediate attention. */
+window.DASHBOARD_TAB = "alerts";
+function setDashboardTab(tab){
+  DASHBOARD_TAB = tab;
+  render();
+}
+
 function sendReminder(){
   toast(`${ICON.check} Reminder sent to client`);
   setTimeout(toDashboard, 1000);
@@ -1054,6 +1111,10 @@ function dismissAlert(){
   toast("Alert dismissed");
 }
 function markLocalPersonal(){
+  toast(`${ICON.check} Marked as a personal transfer — won't count toward fraud risk`);
+  setTimeout(toDashboard, 1100);
+}
+function markSuspiciousPersonal(){
   toast(`${ICON.check} Marked as a personal transfer — won't count toward fraud risk`);
   setTimeout(toDashboard, 1100);
 }
@@ -1415,12 +1476,7 @@ SCREENS.paymentAlerts = () => `
       ${toggleRow("Alert me when no matching invoice is found — including local payments", true, "tg3")}
       <div class="toggle-row" style="display:block; border-bottom:none">
         <div class="lbl" style="margin-bottom:8px">Home-base country</div>
-        <select class="input">
-          <option selected>Singapore</option>
-          <option>Malaysia</option>
-          <option>Indonesia</option>
-          <option>Other</option>
-        </select>
+        <div class="input" style="display:flex;align-items:center;color:var(--ink);background:var(--navy-tint);border-color:var(--line)">Singapore</div>
       </div>
       ${toggleRow("Increase risk level for unmatched payments from outside my home-base country", true, "tg4")}
       <div style="margin-top:4px">
@@ -1527,6 +1583,12 @@ const ALERT_ICON = {
 const ALERT_MODAL = { underpay:"underpayment", overpay:"overpayment", overdue:"overdue", local_mismatch:"localMismatch", suspicious:"suspicious" };
 const ALERT_DETAIL_SCREEN = { underpay:"underpaymentDetails", overpay:"overpaymentDetails", overdue:"overdueDetails", local_mismatch:"localMismatchDetails", suspicious:"suspiciousDetails" };
 
+/* Alerts are shown most-urgent-first, not in data-entry order, so the freelancer
+   always sees the thing that needs their attention most at the top of the list. */
+function sortedAlerts(){
+  return DATA.alerts.slice().sort((a,b) => b.score - a.score);
+}
+
 function alertCard(a, clickable=true){
   const meta = ALERT_ICON[a.type];
   return `
@@ -1562,7 +1624,7 @@ SCREENS.dashboard = () => `
   <div class="screen-pad">
     <div class="tile-grid">
       <div class="tile"><div class="tile-ic" style="background:var(--navy-tint);color:var(--navy-3)">${ICON.clock(15)}</div><div class="tile-num" style="color:var(--navy-3)">1</div><div class="tile-label">Awaiting Payment</div></div>
-      <div class="tile"><div class="tile-ic" style="background:var(--green-tint);color:var(--green)">${ICON.check}</div><div class="tile-num" style="color:var(--green)">1</div><div class="tile-label">Paid</div></div>
+      <div class="tile"><div class="tile-ic" style="background:var(--green-tint);color:var(--green)">${ICON.check}</div><div class="tile-num" style="color:var(--green)">3</div><div class="tile-label">Paid</div></div>
       <div class="tile"><div class="tile-ic" style="background:var(--orange-tint);color:var(--orange)">${ICON.alertTriangle(15)}</div><div class="tile-num" style="color:var(--orange)">1</div><div class="tile-label">Overdue</div></div>
       <div class="tile"><div class="tile-ic" style="background:var(--red-tint);color:var(--red)">${ICON.bell(14)}</div><div class="tile-num" style="color:var(--red)">${DATA.alerts.length}</div><div class="tile-label">Alerts</div></div>
     </div>
@@ -1571,42 +1633,54 @@ SCREENS.dashboard = () => `
       ${btn("View All Invoices", "go('allInvoices')", "secondary")}
     </div>
 
-    <div class="section-title"><span class="st-left"><span class="st-ic">${ICON.fileText(14)}</span>Recent Invoices</span><span class="link" onclick="go('allInvoices')">View all</span></div>
-    <div class="card card-accent risk-low">
-      <div class="invoice-row">
-        <div>
-          <div class="name">Invoice SP-1003</div>
-          <div class="meta">Rachel Koh · ${ICON.sparkle(11)} Makeup Session</div>
-        </div>
-        <div style="text-align:right">
-          <div class="amt">${money(600)}</div>
-          <div class="meta">Paid · 10 Jul 2026</div>
-        </div>
+    <div class="tab-switch" style="margin-top:20px">
+      <div class="tab-btn ${DASHBOARD_TAB==='alerts'?'active':''}" onclick="setDashboardTab('alerts')">
+        ${ICON.bell(13)} Payment Alerts <span class="tab-count">${DATA.alerts.length}</span>
       </div>
-      <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
-        ${riskBadge("low","10")}
-        ${btn("View Details","go('invoicePaidDetails')","secondary","btn-sm")}
-      </div>
-    </div>
-    <div class="card card-accent risk-moderate">
-      <div class="invoice-row">
-        <div>
-          <div class="name">Invoice SP-1005</div>
-          <div class="meta">June Tan · ${ICON.sparkle(11)} Bridal Makeup</div>
-        </div>
-        <div style="text-align:right">
-          <div class="amt">${money(800)}</div>
-          <div class="meta">Due 18 Jul 2026</div>
-        </div>
-      </div>
-      <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
-        <span class="badge neutral"><span class="badge-dot"></span>Awaiting Payment</span>
-        ${btn("View Invoice","go('invoicePendingDetails')","secondary","btn-sm")}
+      <div class="tab-btn ${DASHBOARD_TAB==='invoices'?'active':''}" onclick="setDashboardTab('invoices')">
+        ${ICON.fileText(13)} Recent Invoices
       </div>
     </div>
 
-    <div class="section-title"><span class="st-left"><span class="st-ic">${ICON.bell(14)}</span>Payment Alerts</span><span class="link" onclick="go('allAlerts')">View all</span></div>
-    ${DATA.alerts.map(a=>alertCard(a)).join("")}
+    ${DASHBOARD_TAB === 'alerts' ? `
+      <div class="section-title" style="margin-top:16px"><span class="st-left"><span class="st-ic">${ICON.bell(14)}</span>Payment Alerts</span><span class="link" onclick="go('allAlerts')">View all</span></div>
+      ${notice("info", ICON.info(16), "Sorted by seriousness — the alert at the top needs your attention first.")}
+      <div style="margin-top:10px">${sortedAlerts().map(a=>alertCard(a)).join("")}</div>
+    ` : `
+      <div class="section-title" style="margin-top:16px"><span class="st-left"><span class="st-ic">${ICON.fileText(14)}</span>Recent Invoices</span><span class="link" onclick="go('allInvoices')">View all</span></div>
+      <div class="card card-accent risk-low">
+        <div class="invoice-row">
+          <div>
+            <div class="name">Invoice SP-1003</div>
+            <div class="meta">Rachel Koh · ${ICON.sparkle(11)} Makeup Session</div>
+          </div>
+          <div style="text-align:right">
+            <div class="amt">${money(600)}</div>
+            <div class="meta">Paid · 10 Jul 2026</div>
+          </div>
+        </div>
+        <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
+          ${riskBadge("low","10")}
+          ${btn("View Details","go('invoicePaidDetails')","secondary","btn-sm")}
+        </div>
+      </div>
+      <div class="card card-accent risk-moderate">
+        <div class="invoice-row">
+          <div>
+            <div class="name">Invoice SP-1005</div>
+            <div class="meta">June Tan · ${ICON.sparkle(11)} Bridal Makeup</div>
+          </div>
+          <div style="text-align:right">
+            <div class="amt">${money(800)}</div>
+            <div class="meta">Due 18 Jul 2026</div>
+          </div>
+        </div>
+        <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
+          <span class="badge neutral"><span class="badge-dot"></span>Awaiting Payment</span>
+          ${btn("View Invoice","go('invoicePendingDetails')","secondary","btn-sm")}
+        </div>
+      </div>
+    `}
   </div>
 `;
 
@@ -1646,7 +1720,7 @@ SCREENS.allInvoices = () => `
         <div style="text-align:right"><div class="amt">${money(800)}</div><div class="meta">Awaiting Payment</div></div>
       </div>
       <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
-        ${riskBadge("moderate","50")}
+        ${riskBadge("moderate","40")}
         ${btn("View","go('invoicePendingDetails')","secondary","btn-sm")}
       </div>
     `, "card-accent risk-moderate")}
@@ -1656,10 +1730,30 @@ SCREENS.allInvoices = () => `
         <div style="text-align:right"><div class="amt">${money(1500)}</div><div class="meta">Invoiced ${money(800)}</div></div>
       </div>
       <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
-        ${riskBadge("moderate","50")}
+        ${riskBadge("moderate","40")}
         ${btn("View","go('overpaymentDetails')","secondary","btn-sm")}
       </div>
     `, "card-accent risk-moderate")}
+    ${card(`
+      <div class="invoice-row">
+        <div><div class="name">SP-1007</div><div class="meta">Amanda Ng · ${ICON.sparkle(11)} Engagement Shoot Makeup</div></div>
+        <div style="text-align:right"><div class="amt">${money(450)}</div><div class="meta">Paid · 5 Jul 2026</div></div>
+      </div>
+      <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
+        ${riskBadge("low","10")}
+        ${btn("View","goPaidInvoiceDetails('SP-1007')","secondary","btn-sm")}
+      </div>
+    `, "card-accent risk-low")}
+    ${card(`
+      <div class="invoice-row">
+        <div><div class="name">SP-1008</div><div class="meta">Priya Nair · ${ICON.sparkle(11)} Photoshoot Makeup</div></div>
+        <div style="text-align:right"><div class="amt">${money(350)}</div><div class="meta">Paid · 1 Jul 2026</div></div>
+      </div>
+      <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
+        ${riskBadge("low","10")}
+        ${btn("View","goPaidInvoiceDetails('SP-1008')","secondary","btn-sm")}
+      </div>
+    `, "card-accent risk-low")}
   </div>
 `;
 
@@ -1673,7 +1767,8 @@ SCREENS.allAlerts = () => `
         <p>Everything flagged for your review</p>
       </div>
     </div>
-    ${DATA.alerts.map(a=>alertCard(a)).join("")}
+    ${notice("info", ICON.info(16), "Sorted by seriousness — the alert at the top needs your attention first.")}
+    <div style="margin-top:10px">${sortedAlerts().map(a=>alertCard(a)).join("")}</div>
   </div>
 `;
 
@@ -1717,6 +1812,34 @@ SCREENS.invoicePaidDetails = () => `
   </div>
 `;
 
+/* ---------------- Generic paid invoice details (SP-1007, SP-1008, and future low-risk examples) ---------------- */
+SCREENS.paidInvoiceDetails = () => {
+  const inv = DATA.invoices[PAID_INVOICE_REF] || {};
+  return `
+  <div class="screen-pad">
+    <div class="decision-hero">
+      <div class="decision-icon risk-low" style="color:var(--green)">${ICON.checkCircle(30)}</div>
+      <h2>Payment Verified</h2>
+    </div>
+    ${card(`
+      ${kv("Invoice Reference", PAID_INVOICE_REF)}
+      ${kv("Client", inv.client || "—")}
+      ${kv("Service", inv.service || "—")}
+      ${kv("Invoice Amount", money(inv.amount || 0))}
+      ${kv("Amount Received", money(inv.received || 0))}
+      ${kv("Payment Date", inv.paidDate || "—")}
+      ${kv("Status", inv.status || "Paid")}
+    `)}
+    <div style="margin-top:12px">${riskScoreBlock(inv.risk || 10, "low")}</div>
+    <div style="margin-top:12px">${notice("info", ICON.info(16), "Recommended outcome: payment successfully verified. No action is required.")}</div>
+    <div class="btn-block-row" style="margin-top:16px">
+      ${btn("Share Invoice", `goShareInvoice('${PAID_INVOICE_REF}')`, "secondary")}
+      ${btn("Back to Dashboard","toDashboard()","primary")}
+    </div>
+  </div>
+`;
+};
+
 /* ---------------- Pending invoice (SP-1005) details ---------------- */
 SCREENS.invoicePendingDetails = () => `
   <div class="screen-pad">
@@ -1748,15 +1871,14 @@ SCREENS.underpaymentDetails = () => `
       ${kv("Amount Received", money(600))}
       ${kv("Outstanding Amount", money(200))}
     `)}
-    <div style="margin-top:12px">${riskScoreBlock(50,"moderate")}</div>
+    <div style="margin-top:12px">${riskScoreBlock(40,"moderate")}</div>
     <div class="section-title" style="margin-top:18px">Risk check breakdown</div>
     ${card(`
       ${riskCheckRow("Payment below invoice amount", 30)}
       ${riskCheckRow("Payment at least 20% below invoice amount", 10)}
-      ${riskCheckRow("First-time client", 10)}
       ${riskCheckRow("Invoice reference matched", 0)}
       <div style="display:flex;justify-content:space-between;padding-top:9px;font-weight:700;font-size:13px">
-        <span>Total</span><span class="mono" style="color:var(--orange)">50/100 · Moderate Risk</span>
+        <span>Total</span><span class="mono" style="color:var(--orange)">40/100 · Moderate Risk</span>
       </div>
     `)}
     <div style="margin-top:12px">${notice("warn", ICON.alertTriangle(16), "Recommended action: contact the client and request the remaining S$200.")}</div>
@@ -1775,15 +1897,14 @@ SCREENS.overpaymentDetails = () => `
       ${kv("Amount Received", money(1500))}
       ${kv("Excess Amount", money(700))}
     `)}
-    <div style="margin-top:12px">${riskScoreBlock(50,"moderate")}</div>
+    <div style="margin-top:12px">${riskScoreBlock(40,"moderate")}</div>
     <div class="section-title" style="margin-top:18px">Risk check breakdown</div>
     ${card(`
       ${riskCheckRow("Payment above invoice amount", 30)}
       ${riskCheckRow("Payment more than 20% above invoice amount", 10)}
-      ${riskCheckRow("First-time payer", 10)}
       ${riskCheckRow("Invoice reference matched", 0)}
       <div style="display:flex;justify-content:space-between;padding-top:9px;font-weight:700;font-size:13px">
-        <span>Total</span><span class="mono" style="color:var(--orange)">50/100 · Moderate Risk</span>
+        <span>Total</span><span class="mono" style="color:var(--orange)">40/100 · Moderate Risk</span>
       </div>
     `)}
     <div style="margin-top:12px">${notice("warn", ICON.alertTriangle(16), "Contact the client to confirm why the payment is higher than the invoice amount. Do not refund the excess until it is verified.")}</div>
@@ -1881,7 +2002,10 @@ SCREENS.suspiciousDetails = () => `
       </div>
     `)}
     <div style="margin-top:12px">${notice("danger", ICON.alertOctagon(16), "This unmatched payment escalated to High Risk because it also came from outside Singapore. Do not use or refund the funds until the payment is verified — contact the bank.")}</div>
-    <div style="margin-top:16px">${btn("Contact Bank","go('contactBank')","primary")}</div>
+    <div class="btn-block-row" style="margin-top:16px">
+      ${btn("Mark as Personal","markSuspiciousPersonal()","secondary")}
+      ${btn("Contact Bank","go('contactBank')","primary")}
+    </div>
   </div>
 `;
 
@@ -1953,7 +2077,7 @@ const MODALS = {
         <h3>Payment Amount Mismatch</h3>
         <p>S$600 was received for Invoice SP-1005, but the invoiced amount is S$800.</p>
         ${card(`${kv("Outstanding Amount", money(200))}`)}
-        <div style="margin:12px 0">${riskScoreBlock(50,"moderate")}</div>
+        <div style="margin:12px 0">${riskScoreBlock(40,"moderate")}</div>
         <div class="btn-block-row">
           ${btn("View Details","viewFromModal('underpaymentDetails')","primary")}
           ${btn("Dismiss","dismissAlert()","secondary")}
@@ -1969,7 +2093,7 @@ const MODALS = {
         <h3>Overpayment Detected</h3>
         <p>S$1,500 was received for Invoice SP-1006, but the invoiced amount is S$800.</p>
         ${card(`${kv("Excess Amount", money(700))}`)}
-        <div style="margin:12px 0">${riskScoreBlock(50,"moderate")}</div>
+        <div style="margin:12px 0">${riskScoreBlock(40,"moderate")}</div>
         ${notice("warn", ICON.info(16), "Do not refund the excess amount until the payment has been verified.")}
         <div class="btn-block-row" style="margin-top:12px">
           ${btn("View Details","viewFromModal('overpaymentDetails')","primary")}
