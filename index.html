@@ -835,9 +835,9 @@ const DATA = {
   selectedBank:"DBS",
   invoices:{
     "SP-1003":{client:"Rachel Koh", service:"Makeup Session", amount:600, received:600, due:"—", paidDate:"10 July 2026", status:"Paid", risk:10, level:"low", origin:"Singapore"},
-    "SP-1004":{client:"—", service:"—", amount:800, received:0, due:"18 July 2026", status:"Overdue", risk:35, level:"moderate"},
+    "SP-1004":{client:"Nadia Rahman", service:"—", amount:800, received:0, due:"18 July 2026", status:"Overdue", risk:35, level:"moderate"},
     "SP-1005":{client:"June Tan", service:"Bridal Makeup", amount:800, received:600, due:"18 July 2026", status:"Awaiting Payment", risk:40, level:"moderate", ref:"SP-1005", contact:"WhatsApp"},
-    "SP-1006":{client:"Unknown client", service:"—", amount:800, received:1500, due:"—", status:"Under Review", risk:40, level:"moderate"},
+    "SP-1006":{client:"Farah Ismail", service:"—", amount:800, received:1500, due:"—", status:"Under Review", risk:40, level:"moderate"},
     "SP-1007":{client:"Amanda Ng", service:"Engagement Shoot Makeup", amount:450, received:450, due:"—", paidDate:"5 July 2026", status:"Paid", risk:10, level:"low", origin:"Singapore"},
     "SP-1008":{client:"Priya Nair", service:"Photoshoot Makeup", amount:350, received:350, due:"—", paidDate:"1 July 2026", status:"Paid", risk:10, level:"low", origin:"Singapore"}
   },
@@ -1867,6 +1867,8 @@ SCREENS.invoicePendingDetails = () => `
 SCREENS.underpaymentDetails = () => `
   <div class="screen-pad">
     ${card(`
+      ${kv("Invoice Reference","SP-1005")}
+      ${kv("Client","June Tan")}
       ${kv("Invoice Amount", money(800))}
       ${kv("Amount Received", money(600))}
       ${kv("Outstanding Amount", money(200))}
@@ -1893,6 +1895,8 @@ SCREENS.underpaymentDetails = () => `
 SCREENS.overpaymentDetails = () => `
   <div class="screen-pad">
     ${card(`
+      ${kv("Invoice Reference","SP-1006")}
+      ${kv("Client","Farah Ismail")}
       ${kv("Invoice Amount", money(800))}
       ${kv("Amount Received", money(1500))}
       ${kv("Excess Amount", money(700))}
@@ -1921,6 +1925,7 @@ SCREENS.overdueDetails = () => `
   <div class="screen-pad">
     ${card(`
       ${kv("Invoice Reference","SP-1004")}
+      ${kv("Client","Nadia Rahman")}
       ${kv("Invoice Amount", money(800))}
       ${kv("Amount Received", money(0))}
       ${kv("Due Date","18 July 2026")}
