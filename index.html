@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
+
 :root{
   --navy:#0E1C36;
   --navy-2:#16294B;
@@ -257,6 +258,40 @@ select.input{ appearance:none; -webkit-appearance:none; background-image:url("da
   gap:12px;
 }
 .kv-row:last-child{ border-bottom:none; }
+.v-verified{ display:flex; flex-direction:column; align-items:flex-end; gap:3px; }
+.verified-tag{
+  display:inline-flex; align-items:center; gap:4px;
+  font-size:10.5px; font-weight:700;
+  color:var(--green);
+  font-family:var(--font-mono);
+}
+.verified-tag svg{ width:11px; height:11px; }
+
+/* ---------- Verifying Identity loading screen ---------- */
+.verifying-wrap{
+  position:relative;
+  width:110px; height:110px;
+  margin:60px auto 24px;
+  display:flex; align-items:center; justify-content:center;
+}
+.verifying-ring{
+  position:absolute;
+  width:90px; height:90px;
+  border-radius:50%;
+  border:1.5px solid var(--navy-3);
+}
+@media (prefers-reduced-motion: no-preference){
+  .verifying-ring{ animation:radarPulse 2.2s ease-out infinite; }
+  .verifying-ring.r2{ animation-delay:1.1s; }
+}
+.verifying-icon-wrap{
+  position:relative; z-index:2;
+  width:64px; height:64px;
+  border-radius:50%;
+  background:var(--navy-tint);
+  color:var(--navy-3);
+  display:flex; align-items:center; justify-content:center;
+}
 .kv-row .k{ font-size:13px; color:var(--muted); }
 .kv-row .v{ font-size:13.5px; font-weight:600; color:var(--ink); text-align:right; font-family:var(--font-mono); }
 
@@ -434,7 +469,8 @@ select.input{ appearance:none; -webkit-appearance:none; background-image:url("da
 .landing-actions{ display:flex; flex-direction:column; gap:10px; }
 .landing .btn-primary{ background:var(--white); color:var(--navy); }
 .landing .btn-secondary{ background:transparent; color:var(--white); border:1.5px solid rgba(255,255,255,.4); }
-.landing .btn-singpass{ background:#EF3E36; color:var(--white); }
+.landing .btn-singpass{ background:#000000; color:var(--white); }
+.landing .btn-singpass:active{ background:#1a1a1a; }
 .landing-foot{ text-align:center; font-size:11px; color:rgba(255,255,255,.45); margin-top:16px; font-family:var(--font-mono); letter-spacing:.04em;}
 
 /* ---------- Dashboard header ---------- */
@@ -742,21 +778,52 @@ select.input{ appearance:none; -webkit-appearance:none; background-image:url("da
 /* ---------- Face liveness check (Singpass face verification screen) ---------- */
 .face-scan-wrap{
   position:relative;
-  width:132px; height:132px;
+  width:152px; height:152px;
   margin:6px auto 22px;
   display:flex; align-items:center; justify-content:center;
 }
-.face-spinner{
+.face-frame{
   position:absolute;
-  width:112px; height:112px;
-  border-radius:50%;
-  border:3px solid var(--line);
-  border-top-color:var(--navy-3);
+  width:130px; height:130px;
+  border-radius:24px;
+  overflow:hidden;
+}
+.face-corner{
+  position:absolute;
+  width:24px; height:24px;
+  border-style:solid;
+  border-width:0;
+  border-color:var(--navy-3);
+  transition:border-color .3s ease, opacity .3s ease;
+}
+.face-corner.tl{ top:0; left:0; border-top-width:3px; border-left-width:3px; border-radius:11px 0 0 0; }
+.face-corner.tr{ top:0; right:0; border-top-width:3px; border-right-width:3px; border-radius:0 11px 0 0; }
+.face-corner.bl{ bottom:0; left:0; border-bottom-width:3px; border-left-width:3px; border-radius:0 0 0 11px; }
+.face-corner.br{ bottom:0; right:0; border-bottom-width:3px; border-right-width:3px; border-radius:0 0 11px 0; }
+@media (prefers-reduced-motion: no-preference){
+  .face-corner{ animation:cornerPulse 1.6s ease-in-out infinite; }
+}
+@keyframes cornerPulse{
+  0%,100%{ opacity:.5; }
+  50%{ opacity:1; }
+}
+.face-beam{
+  position:absolute;
+  left:10%; right:10%;
+  top:14%;
+  height:3px;
+  border-radius:2px;
+  background:linear-gradient(90deg, transparent, var(--navy-3), transparent);
+  box-shadow:0 0 10px 2px rgba(34,56,95,.45);
 }
 @media (prefers-reduced-motion: no-preference){
-  .face-spinner{ animation:spin .9s linear infinite; }
+  .face-beam{ animation:faceScanBeam 1.7s ease-in-out infinite; }
 }
-@keyframes spin{ to{ transform:rotate(360deg); } }
+@keyframes faceScanBeam{
+  0%{ top:14%; }
+  50%{ top:80%; }
+  100%{ top:14%; }
+}
 .face-icon-wrap{
   position:relative; z-index:2;
   width:82px; height:82px;
@@ -812,6 +879,7 @@ select.input{ appearance:none; -webkit-appearance:none; background-image:url("da
 <div id="modalroot"></div>
 
 <script>
+
 /* =========================================================
    SecurePay — Clickable Prototype
    C369 Financial Technologies — RegTech FA Prototype
@@ -826,9 +894,10 @@ const DATA = {
     email:"sarahlim14@gmail.com",
     password:"SecurePay123",
     phone:"91234567",
-    nric:"S****1234A",
+    nric:"SXXXX567A",
     dob:"12 March 1990",
     country:"Singapore",
+    address:"12 Tampines Ave 4, #08-23, Singapore 529685",
     initials:"SL"
   },
   banks:["DBS","UOB","OCBC","Standard Chartered"],
@@ -849,6 +918,12 @@ const DATA = {
     {id:"a5", type:"suspicious", title:"Suspicious Payment Detected", msg:"An overseas payment of S$4,500 has no matching invoice.", level:"high", score:75}
   ]
 };
+
+/* Snapshot of the original 5 alerts, taken once at load time. "Mark as Personal" removes
+   an alert from DATA.alerts for real (see removeAlertByType below) — restoring from this
+   snapshot on every Restart Demo means that removal doesn't have to be permanent for the
+   rest of a demo session, so the same flow can be shown again without reloading the page. */
+const ORIGINAL_ALERTS = DATA.alerts.map(a => ({ ...a }));
 
 /* ---------------- App state ---------------- */
 const APP = {
@@ -880,6 +955,7 @@ function back(){
   }
 }
 function resetApp(){
+  DATA.alerts = ORIGINAL_ALERTS.map(a => ({ ...a })); // undo any Mark as Personal removals
   APP.current = "landing";
   APP.history = [];
   APP.modal = null;
@@ -954,6 +1030,7 @@ function riskScoreBlock(score,level){
   </div>`;
 }
 function kv(k,v){ return `<div class="kv-row"><span class="k">${k}</span><span class="v">${v}</span></div>`; }
+function kvVerified(k,v){ return `<div class="kv-row"><span class="k">${k}</span><span class="v-verified"><span class="v">${v}</span><span class="verified-tag">${ICON.check} Verified</span></span></div>`; }
 function riskCheckRow(label, pts){ return `<div class="risk-check-row"><span>${label}</span><span class="pts">${pts>0?"+":""}${pts}</span></div>`; }
 function toggleRow(label, on, id){
   return `<div class="toggle-row"><span class="lbl">${label}</span><div id="${id}" class="switch ${on?"on":""}" onclick="toggleSwitch(this)"></div></div>`;
@@ -970,15 +1047,14 @@ function sectionTitle(iconHtml, label, linkHtml=""){
 const NO_CHROME = ["landing","dashboard"]; // screens that render their own full header
 
 const META = {
-  singpassReturning:{title:"Log In with Singpass"},
+  singpassAuthPanel:{title:"Singpass"},
   singpassPasscode:{title:"Singpass Passcode"},
   singpassFaceScan:{title:"Face Verification"},
-  singpassVerifiedReturning:{title:"Login Verified"},
-  createAccount:{title:"Create Account"},
-  myInfoConsent:{title:"MyInfo Consent"},
-  singpassNew:{title:"Verify Your Identity"},
-  identityVerified:{title:"Identity Verified"},
+  processingStep:{title:"Please Wait"},
+  singpassConsent:{title:"Authorise SecurePay"},
+  singpassVerifiedDetails:{title:"Identity Verified"},
   connectBank:{title:"Connect Bank"},
+  bankVerification:{title:"Bank Verification"},
   bankConnected:{title:"Bank Connected"},
   paymentAlerts:{title:"Payment Alerts"},
   createInvoice:{title:"Create Invoice"},
@@ -991,6 +1067,7 @@ const META = {
   underpaymentDetails:{title:"Underpayment Details"},
   overpaymentDetails:{title:"Overpayment Details"},
   overdueDetails:{title:"Overdue Payment"},
+  localMismatchDetails:{title:"Unmatched Local Payment"},
   suspiciousDetails:{title:"Suspicious Payment"},
   contactClient:{title:"Contact Client"},
   contactBank:{title:"Contact Bank"},
@@ -1087,18 +1164,30 @@ function startTrial(){
    a fixed PIN they already set up, not a one-time SMS code — in both the returning-user
    login and the new-user identity verification flows. This holds which screen to continue
    to once the passcode is verified, since the same screen serves both flows. */
-window.SINGPASS_NEXT = "singpassVerifiedReturning";
+window.SINGPASS_NEXT = "processingStep";
 function goSingpassPasscode(nextScreen){
   SINGPASS_NEXT = nextScreen;
   go('singpassPasscode');
 }
-/* A face liveness check (look left / look right) happens before the passcode, in both flows. */
+/* A face liveness check happens before the passcode, in both flows. */
 function goSingpassFaceScan(nextScreen){
   SINGPASS_NEXT = nextScreen;
   go('singpassFaceScan');
 }
 function forgotSingpassPasscode(){
   toast(`${ICON.info(14)} Redirecting to Singpass app reset (simulated)`);
+}
+
+/* Entry point for both Landing buttons. SINGPASS_FINAL_NEXT holds where the user ends up
+   once identity is authenticated — 'singpassConsent' for a new account (consent still to
+   come), 'dashboard' for a returning login (which skips onboarding entirely). Both flows
+   share the same branded Singpass panel, face verification, and passcode fallback. */
+window.SINGPASS_FINAL_NEXT = "dashboard";
+function startSingpassAuth(finalNext){
+  SINGPASS_FINAL_NEXT = finalNext;
+  PROCESSING_MESSAGE = "Verifying your identity…";
+  PROCESSING_NEXT = finalNext;
+  go('singpassAuthPanel');
 }
 
 let SHARE_CHANNEL = "WhatsApp";
@@ -1110,12 +1199,28 @@ function dismissAlert(){
   closeModal();
   toast("Alert dismissed");
 }
+/* "Mark as Personal" permanently removes an alert from fraud review, so it requires an
+   explicit confirmation that the sender has genuinely been verified — not just a tap.
+   PENDING_MARK_PERSONAL holds which alert type + human-readable label is being confirmed,
+   so one shared confirmation modal can serve both entry points below. */
+let PENDING_MARK_PERSONAL = { alertType: "local_mismatch", label: "this payment" };
+function requestMarkPersonal(alertType, label){
+  PENDING_MARK_PERSONAL = { alertType, label };
+  openModal("confirmMarkPersonal");
+}
+function removeAlertByType(type){
+  DATA.alerts = DATA.alerts.filter(a => a.type !== type);
+}
 function markLocalPersonal(){
-  toast(`${ICON.check} Marked as a personal transfer — won't count toward fraud risk`);
+  removeAlertByType("local_mismatch");
+  closeModal();
+  toast(`${ICON.check} Marked as a personal transfer — removed from your fraud alerts`);
   setTimeout(toDashboard, 1100);
 }
 function markSuspiciousPersonal(){
-  toast(`${ICON.check} Marked as a personal transfer — won't count toward fraud risk`);
+  removeAlertByType("suspicious");
+  closeModal();
+  toast(`${ICON.check} Marked as a personal transfer — removed from your fraud alerts`);
   setTimeout(toDashboard, 1100);
 }
 function viewFromModal(screen){
@@ -1186,8 +1291,8 @@ SCREENS.landing = () => `
       <p class="tag">Safe payments for freelancers</p>
     </div>
     <div class="landing-actions">
-      ${btn("Create Account", "go('createAccount')", "primary")}
-      <button class="btn btn-singpass" onclick="go('singpassReturning')" style="gap:9px">${ICON.fingerprint(17)} Log In with Singpass</button>
+      <button class="btn btn-singpass" onclick="startSingpassAuth('singpassConsent')" style="gap:9px">${ICON.fingerprint(17)} Create Account with Singpass</button>
+      <button class="btn btn-singpass" onclick="startSingpassAuth('dashboard')" style="gap:9px">${ICON.fingerprint(17)} Log In with Singpass</button>
     </div>
   </div>
 `;
@@ -1211,12 +1316,18 @@ function spVerifyPanel(subtitle){
   `;
 }
 
-/* ---------------- Singpass returning-user login ---------------- */
-SCREENS.singpassReturning = () => `
+/* ---------------- Singpass authentication panel — shared by Create Account & Log In ---------------- */
+/* SINGPASS_FINAL_NEXT ('singpassConsent' vs 'dashboard') decides the subtitle copy here,
+   and — after face verification / passcode succeeds and identity is confirmed — whether
+   the user lands on the consent screen (new account) or straight into the dashboard
+   (returning login, no onboarding shown at all). */
+SCREENS.singpassAuthPanel = () => `
   <div class="screen-pad">
-    ${spVerifyPanel("National Digital Identity · Verification requested by SecurePay")}
+    ${spVerifyPanel(SINGPASS_FINAL_NEXT === "dashboard"
+      ? "National Digital Identity · Log in to your account"
+      : "National Digital Identity · Identity verification for onboarding")}
     <div style="margin-top:16px">
-      ${btn("Verify with Singpass", "goSingpassFaceScan('singpassVerifiedReturning')", "primary")}
+      ${btn("Verify with Singpass", "goSingpassFaceScan('processingStep')", "primary")}
     </div>
   </div>
 `;
@@ -1228,12 +1339,21 @@ SCREENS.singpassFaceScan = () => `
   <div class="screen-pad" style="text-align:center">
     <p class="muted small" id="faceStatusText">Scanning your face…</p>
     <div class="face-scan-wrap">
-      <div class="face-spinner" id="faceSpinner"></div>
+      <div class="face-frame" id="faceFrame">
+        <div class="face-corner tl" id="faceCornerTL"></div>
+        <div class="face-corner tr" id="faceCornerTR"></div>
+        <div class="face-corner bl" id="faceCornerBL"></div>
+        <div class="face-corner br" id="faceCornerBR"></div>
+        <div class="face-beam" id="faceBeam"></div>
+      </div>
       <div class="face-icon-wrap" id="faceIconWrap">${ICON.face(38)}</div>
     </div>
     <div id="faceResultWrap" style="display:none"></div>
     <div style="margin-top:10px">
       <span class="small muted" style="cursor:pointer;text-decoration:underline" onclick="forceFaceScanFail()">Trouble scanning? Use passcode instead</span>
+    </div>
+    <div style="margin-top:22px">
+      ${notice("info", ICON.lock(15), "This verification happens securely within the Singpass app. SecurePay never receives or stores your face scan or passcode.")}
     </div>
   </div>
 `;
@@ -1244,7 +1364,16 @@ function renderFaceScanOutcome(myMount, outcome){
   if (faceScanMountId !== myMount) return; // user navigated away or a newer scan started
   const iconWrap = document.getElementById("faceIconWrap");
   if (!iconWrap) return;
-  document.getElementById("faceSpinner").style.display = "none";
+
+  // Stop the scanning beam and freeze the corner brackets in the outcome colour —
+  // mirrors how a real camera's autofocus brackets lock solid once they find a face.
+  document.getElementById("faceBeam").style.display = "none";
+  const color = outcome === "success" ? "var(--green)" : "var(--red)";
+  ["faceCornerTL","faceCornerTR","faceCornerBL","faceCornerBR"].forEach(id => {
+    const c = document.getElementById(id);
+    if (c) { c.style.borderColor = color; c.style.animation = "none"; c.style.opacity = "1"; }
+  });
+
   const statusText = document.getElementById("faceStatusText");
   const resultWrap = document.getElementById("faceResultWrap");
 
@@ -1318,95 +1447,104 @@ SCREENS.singpassPasscode = () => `
       <div class="keypad-key backspace">${ICON.backspace(17)}</div>
     </div>
     ${btn("Verify", "go(SINGPASS_NEXT)", "primary")}
-  </div>
-`;
-
-SCREENS.singpassVerifiedReturning = () => `
-  <div class="screen-pad">
-    <div class="decision-hero">
-      <div class="decision-icon risk-low" style="color:var(--green)">${ICON.checkCircle(30)}</div>
-      <h2>Login Verified</h2>
-      <p>Your identity has been confirmed via Singpass.</p>
-    </div>
     <div style="margin-top:18px">
-      ${btn("Continue to SecurePay", "go('dashboard')", "primary")}
+      ${notice("info", ICON.lock(15), "Your passcode is entered and checked within the Singpass app itself. SecurePay never sees or stores it.")}
     </div>
   </div>
 `;
 
-/* ---------------- Create account ---------------- */
-SCREENS.createAccount = () => `
-  <div class="screen-pad">
-    <div class="screen-lead">
-      <div class="screen-lead-ic">${ICON.face(20)}</div>
-      <div>
-        <h3>Create your account</h3>
-        <p>Just the basics to get you started</p>
-      </div>
+/* ---------------- Generic processing/loading screen — reused for two distinct backend moments ---------------- */
+/* 1) Right after biometric/passcode success: "Verifying your identity…" (authentication).
+   2) Right after the user gives consent: "Retrieving your verified information…" (the actual
+      MyInfo data-sharing call, which Singpass only permits AFTER consent is given — see
+      singpassConsent below). Same UI, different message/destination each time it's used. */
+window.PROCESSING_MESSAGE = "Verifying your identity…";
+window.PROCESSING_NEXT = "dashboard";
+SCREENS.processingStep = () => `
+  <div class="screen-pad" style="text-align:center">
+    <div class="verifying-wrap">
+      <div class="verifying-ring"></div>
+      <div class="verifying-ring r2"></div>
+      <div class="verifying-icon-wrap">${ICON.shield(28)}</div>
     </div>
-    <div class="field"><label>Full Name</label><input class="input" value="${DATA.user.name}" readonly></div>
-    <div class="field"><label>Email</label><input class="input" value="${DATA.user.email}" readonly></div>
-    <div class="field"><label>Phone Number</label><input class="input" value="+65 ${DATA.user.phone}" readonly></div>
-    <div class="field"><label>Password</label><input class="input" type="password" value="${DATA.user.password}" readonly></div>
-    <div class="field"><label>Confirm Password</label><input class="input" type="password" value="${DATA.user.password}" readonly></div>
-    <div class="check-row">
-      <div class="check-box" style="color:#fff">${ICON.check}</div>
-      <span>I agree to the Terms of Service and Privacy Policy</span>
-    </div>
-    ${btn("Sign Up", "go('myInfoConsent')", "primary")}
+    <p class="muted small">${PROCESSING_MESSAGE}</p>
   </div>
 `;
+let processingMountId = 0;
+SCREEN_MOUNT.processingStep = function(){
+  processingMountId++;
+  const myMount = processingMountId;
+  setTimeout(() => {
+    if (processingMountId !== myMount) return; // user navigated away or this screen re-mounted since
+    if (PROCESSING_NEXT === "dashboard") toDashboard();
+    else go(PROCESSING_NEXT);
+  }, 1300);
+};
 
-/* ---------------- MyInfo consent ---------------- */
-SCREENS.myInfoConsent = () => `
+/* ---------------- Singpass consent — new account only ---------------- */
+/* Correct MyInfo sequencing: SecurePay states WHICH fields it wants and WHY, before any
+   data is shared. Nothing here is masked/verified yet, because nothing has been retrieved
+   yet — Singpass only shares MyInfo data after the user actively consents on this screen.
+   See: https://docs.developer.singpass.gov.sg/docs/products/singpass-myinfo */
+SCREENS.singpassConsent = () => `
   <div class="screen-pad">
     <div class="screen-lead">
       <div class="screen-lead-ic">${ICON.shield(20)}</div>
       <div>
-        <h3>Your data, protected</h3>
-        <p>SecurePay is requesting these details from MyInfo</p>
+        <h3>Authorise SecurePay</h3>
+        <p>Review the information SecurePay is requesting from Singpass.</p>
       </div>
     </div>
     ${card(`
       <div class="check-item"><span style="color:var(--navy-3)">${ICON.check}</span> Full Name</div>
-      <div class="check-item"><span style="color:var(--navy-3)">${ICON.check}</span> Masked NRIC</div>
+      <div class="check-item"><span style="color:var(--navy-3)">${ICON.check}</span> NRIC/FIN</div>
+      <div class="check-item"><span style="color:var(--navy-3)">${ICON.check}</span> Mobile Number</div>
+      <div class="check-item"><span style="color:var(--navy-3)">${ICON.check}</span> Email Address</div>
+      <div class="check-item"><span style="color:var(--navy-3)">${ICON.check}</span> Residential Address</div>
       <div class="check-item"><span style="color:var(--navy-3)">${ICON.check}</span> Date of Birth</div>
-      <div class="check-item"><span style="color:var(--navy-3)">${ICON.check}</span> Registered Country</div>
     `)}
     <div style="margin-top:12px">
-      ${notice("info", ICON.info(16), "This information will only be used for identity verification.")}
+      ${notice("info", ICON.info(16), "Purpose: to verify your identity and set up your SecurePay account. This data will only be shared with SecurePay after you authorise below — nothing is retrieved before that.")}
     </div>
     <div style="margin-top:16px">
-      ${btn("Agree and Continue", "go('singpassNew')", "primary")}
+      ${btn("Authorise and Continue", "authoriseConsent()", "primary")}
+    </div>
+    <div style="margin-top:10px">
+      ${btn("Not Now", "declineConsent()", "secondary")}
     </div>
   </div>
 `;
+function authoriseConsent(){
+  PROCESSING_MESSAGE = "Retrieving your verified information…";
+  PROCESSING_NEXT = "singpassVerifiedDetails";
+  go('processingStep');
+}
+function declineConsent(){
+  toast(`${ICON.info(14)} Account creation requires Singpass consent to continue`);
+  setTimeout(resetApp, 900);
+}
 
-/* ---------------- New-user Singpass verification ---------------- */
-SCREENS.singpassNew = () => `
-  <div class="screen-pad">
-    ${spVerifyPanel("National Digital Identity · Identity verification for onboarding")}
-    <div style="margin-top:16px">
-      ${btn("Verify with Singpass", "goSingpassFaceScan('identityVerified')", "primary")}
-    </div>
-  </div>
-`;
-
-/* ---------------- Identity verified ---------------- */
-SCREENS.identityVerified = () => `
+/* ---------------- Verified details — shown only AFTER consent + retrieval ---------------- */
+SCREENS.singpassVerifiedDetails = () => `
   <div class="screen-pad">
     <div class="decision-hero">
       <div class="decision-icon risk-low" style="color:var(--green)">${ICON.checkCircle(30)}</div>
       <h2>Identity Verified</h2>
     </div>
     ${card(`
-      ${kv("Name", DATA.user.name)}
-      ${kv("Masked NRIC", DATA.user.nric)}
-      ${kv("Date of Birth", DATA.user.dob)}
-      ${kv("Registered Country", DATA.user.country)}
-      ${kv("Decision", `<span class="badge risk-low"><span class="badge-dot"></span>Approved</span>`)}
+      ${kvVerified("Full Name", DATA.user.name)}
+      ${kvVerified("NRIC/FIN", DATA.user.nric)}
+      ${kvVerified("Mobile Number", "+65 " + DATA.user.phone)}
+      ${kvVerified("Email Address", DATA.user.email)}
+      ${kvVerified("Residential Address", DATA.user.address)}
+      ${kvVerified("Date of Birth", DATA.user.dob)}
     `)}
-    <div style="margin-top:16px">${btn("Continue", "go('connectBank')", "primary")}</div>
+    <div style="margin-top:12px">
+      ${notice("info", ICON.lock(16), "This information was retrieved and verified through Singpass, after your consent. Your full NRIC is never shown or stored — only a masked version.")}
+    </div>
+    <div style="margin-top:16px">
+      ${btn("Continue", "go('connectBank')", "primary")}
+    </div>
   </div>
 `;
 
@@ -1429,9 +1567,31 @@ SCREENS.connectBank = () => `
     <div style="margin:14px 0">
       ${notice("info", ICON.lock(16), "SecurePay uses read-only access to retrieve transaction information for payment monitoring. SecurePay cannot transfer or withdraw money.")}
     </div>
-    ${btn("Connect Securely", "go('bankConnected')", "primary")}
+    ${btn("Continue to Bank Verification", "go('bankVerification')", "primary")}
   </div>
 `;
+
+/* ---------------- Bank Verification — the bank itself authenticates the connection, not SecurePay ---------------- */
+/* Mirrors the same principle established for Singpass: SecurePay redirects to the bank's
+   own authentication, and never receives or stores the bank password itself. */
+SCREENS.bankVerification = () => `
+  <div class="screen-pad">
+    <div class="screen-lead">
+      <div class="screen-lead-ic">${ICON.bank(20)}</div>
+      <div>
+        <h3>Bank Verification</h3>
+        <p>Confirming access with ${DATA.selectedBank}</p>
+      </div>
+    </div>
+    ${notice("info", ICON.lock(16), "You will be redirected to your bank to authenticate and approve read-only access. SecurePay never receives your bank password.")}
+    <div style="margin-top:16px">${btn(`Continue to ${DATA.selectedBank}`, "goBankAuth()", "primary")}</div>
+  </div>
+`;
+function goBankAuth(){
+  PROCESSING_MESSAGE = "Bank Authentication Successful";
+  PROCESSING_NEXT = "bankConnected";
+  go('processingStep');
+}
 
 SCREENS.bankConnected = () => `
   <div class="screen-pad">
@@ -1977,7 +2137,7 @@ SCREENS.localMismatchDetails = () => `
       ${notice("info", ICON.info(16), "If this is a personal transfer (e.g. from a friend or family member), you can mark it as personal so it stops counting toward fraud risk.")}
     </div>
     <div class="btn-block-row" style="margin-top:16px">
-      ${btn("Mark as Personal","markLocalPersonal()","secondary")}
+      ${btn("Mark as Personal","requestMarkPersonal('local_mismatch','the S\$150 payment from Marcus Ong')","secondary")}
       ${btn("Contact Bank","go('contactBank')","primary")}
     </div>
   </div>
@@ -2008,7 +2168,7 @@ SCREENS.suspiciousDetails = () => `
     `)}
     <div style="margin-top:12px">${notice("danger", ICON.alertOctagon(16), "This unmatched payment escalated to High Risk because it also came from outside Singapore. Do not use or refund the funds until the payment is verified — contact the bank.")}</div>
     <div class="btn-block-row" style="margin-top:16px">
-      ${btn("Mark as Personal","markSuspiciousPersonal()","secondary")}
+      ${btn("Mark as Personal","requestMarkPersonal('suspicious','the S\$4,500 payment from PayBridge Remittance Co.')","secondary")}
       ${btn("Contact Bank","go('contactBank')","primary")}
     </div>
   </div>
@@ -2154,8 +2314,27 @@ const MODALS = {
         </div>
       </div>
     </div>
+  `,
+  confirmMarkPersonal: () => `
+    <div class="modal-overlay" onclick="if(event.target===this) closeModal()">
+      <div class="modal-sheet">
+        <div class="modal-grabber"></div>
+        <div class="modal-icon risk-moderate" style="color:var(--orange)">${ICON.alertTriangle(26)}</div>
+        <h3>Confirm Before Marking as Personal</h3>
+        <p>Have you personally verified the sender of ${PENDING_MARK_PERSONAL.label}? This will remove it from your fraud alerts and it will no longer count toward risk scoring.</p>
+        <div class="btn-block-row">
+          ${btn("Yes, I've Verified the Sender", `${PENDING_MARK_PERSONAL.alertType === 'suspicious' ? 'markSuspiciousPersonal' : 'markLocalPersonal'}()`, "primary")}
+          ${btn("Cancel","closeModal()","secondary")}
+        </div>
+      </div>
+    </div>
   `
 };
+
+/* ---------------- Boot ---------------- */
+window.SCREENS = SCREENS;
+window.MODALS = MODALS;
+render();
 
 /* ---------------- Boot ---------------- */
 window.SCREENS = SCREENS;
